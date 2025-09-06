@@ -1,0 +1,14 @@
+name,field,intraday,lookback
+1 minute,1m,TRUE,30
+2 minutes,2m,TRUE,60
+5 minutes,5m,TRUE,60
+15 minutes,15m,TRUE,60
+30 minutes,30m,TRUE,60
+60 minutes,60m,TRUE,730
+90 minutes,90m,TRUE,60
+1 hour,1h,TRUE,730
+1 day,1d,FALSE,NA
+5 days,5d,FALSE,NA
+1 week,1wk,FALSE,NA
+1 month,1mo,FALSE,NA
+3 months,3mo,FALSE,NA
