@@ -4,7 +4,7 @@ Title: Yahoo Finance 'history' API
 Version: 0.1.0
 Date: YYYY-MM-DD
 Authors@R: person("Jason", "Foster", , "jason.j.foster@gmail.com", c("aut", "cre"))
-Description:
+Description: Simple and efficient access to Yahoo Finance's 'history' API <https://finance.yahoo.com/quote/{symbol}/history/> for querying and retrieval of financial data.
 License: GPL (>= 2)
 Encoding: UTF-8
 URL: https://github.com/jasonjfoster/hist

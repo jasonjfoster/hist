@@ -17,8 +17,8 @@ get_data(symbols, from_date = "2007-01-01", to_date = NULL,
 \item{interval}{string. Data interval (see \code{"?data_intervals"}).}
 }
 \value{
-A data frame that contains data from the Yahoo Finance API for the
-specified symbol(s).
+A data frame or list of data frame(s) that contains data from the
+Yahoo Finance API for the specified symbol(s).
 }
 \description{
 A function to get data from the Yahoo Finance API for symbols using a date 

@@ -153,8 +153,8 @@ get_session <- function() {
 ##' @param from_date string. Start date in \code{"YYYY-MM-DD"} format (e.g., \code{"2007-01-01"}).
 ##' @param to_date string. End date in \code{"YYYY-MM-DD"} format.
 ##' @param interval string. Data interval (see \code{"?data_intervals"}).
-##' @return A data frame that contains data from the Yahoo Finance API for the
-##' specified symbol(s).
+##' @return A data frame or list of data frame(s) that contains data from the
+##' Yahoo Finance API for the specified symbol(s).
 ##'
 ##' @examples
 ##' \dontrun{
