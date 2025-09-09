@@ -173,7 +173,26 @@ class Session:
     return result
   
 def get(symbols, from_date = "2007-01-01", to_date = None, interval = "1d"):
+  """
+  Get Data from the Yahoo Finance API
+
+  A method to get data from the Yahoo Finance API for symbols using a date
+  range and interval.
+
+  Parameters:
+    symbols (str or list of str): symbol or list of symbols.
+    from_date (str): start date in "YYYY-MM-DD" format (e.g., "2007-01-01").
+    to_date (str): end date in "YYYY-MM-DD" format.
+    interval (str): data interval (see ``data_intervals``).
+
+  Returns:
+    A data frame or dict of data frames that contains data from the
+    Yahoo Finance API for the specified symbol(s).
     
+  Examples:
+    data = yfh.get_data(["AAPL", "MSFT"])
+  """
+  
   if isinstance(symbols, str):
     symbols = [symbols]
 

@@ -14,7 +14,7 @@ get_data(symbols, from_date = "2007-01-01", to_date = NULL,
 
 \item{to_date}{string. End date in \code{"YYYY-MM-DD"} format.}
 
-\item{interval}{string. Data interval (see \code{"?data_intervals"}).}
+\item{interval}{string. Data interval (see \code{"data_intervals"}).}
 }
 \value{
 A data frame or list of data frame(s) that contains data from the
