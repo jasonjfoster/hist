@@ -52,11 +52,11 @@ check_intraday <- function(from_date, to_date, interval) {
   }
   
   if ((interval == "1m") && (to_date - from_date > 8)) {
-    stop("number of days between 'from_date' and 'to' must be less than or equal to 8")
+    stop("number of days between 'from_date' and 'to_date' must be less than or equal to 8")
   }
   
   if (!is.na(valid_lookback) && (Sys.Date() - from_date > valid_lookback)) {
-    stop(paste0("number of days between 'from' and today must be less than or equal to ", valid_lookback))
+    stop(paste0("number of days between 'from_date' and today must be less than or equal to ", valid_lookback))
   }
   
 }
