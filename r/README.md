@@ -2,7 +2,7 @@
 
 ## Overview
 
-`yfhist` is a package that provides simple and efficient access to Yahoo Finance's historical data API ([/v8/finance/chart/{symbol}](/v8/finance/chart/{symbol})) for querying and retrieval of financial data.
+`yfhist` is a package that provides simple and efficient access to Yahoo Finance's historical data API (`/v8/finance/chart/{symbol}`) for querying and retrieval of financial data.
 
 The core functionality of the `yfhist` package abstracts the complexities of interacting with Yahoo Finance APIs, such as session management, crumb and cookie handling, query construction, date validation, and interval management. This abstraction allows users to focus on retrieving data rather than managing API details. Use cases include historical data across a range of security types:
 
