@@ -1,0 +1,1 @@
+test_symbols <- c("AAPL", "MSFT")

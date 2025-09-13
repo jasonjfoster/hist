@@ -55,8 +55,8 @@ check_intraday <- function(from_date, to_date, interval) {
     stop("number of days between 'from_date' and 'to_date' must be less than or equal to 8")
   }
   
-  if (!is.na(valid_lookback) && (Sys.Date() - from_date > valid_lookback)) {
-    stop(paste0("number of days between 'from_date' and today must be less than or equal to ", valid_lookback))
+  if (!is.na(valid_lookback) && (Sys.Date() - from_date >= valid_lookback)) {
+    stop(paste0("number of days between 'from_date' and today must be less than ", valid_lookback))
   }
   
 }
@@ -190,15 +190,20 @@ get_data <- function(symbols, from_date = "2007-01-01", to_date = NULL, interval
   )
   
   count <- 0
-  cols <- c("index", "open", "high", "low", "close", "adjclose", "volume")
   intraday <- yfhist::data_intervals[["intraday"]][yfhist::data_intervals[["field"]] == interval]
   result_ls <- list()
+  
+  if (!intraday) {
+    cols <- c("index", "open", "high", "low", "close", "adjclose", "volume")
+  } else {
+    cols <- c("index", "open", "high", "low", "close", "volume")
+  }
   
   for (symbol in symbols) {
     
     api_url <- paste0("https://query1.finance.yahoo.com/v8/finance/chart/", symbol, process_url(params))
     
-    curl::handle_setheaders(handle, .list = headers)
+    curl::handle_setheaders(handle, .list = headers) # set headers once!
     
     result_df <- tryCatch({
       
@@ -215,20 +220,29 @@ get_data <- function(symbols, from_date = "2007-01-01", to_date = NULL, interval
       
       tz <- result_df[["meta"]][["exchangeTimezoneName"]]
       ohlcv <- unlist(result_df[["indicators"]][["quote"]][[1]], recursive = FALSE)
-      adjclose <- unlist(result_df[["indicators"]][["adjclose"]][[1]], recursive = FALSE)
       index <- result_df[["timestamp"]][[1]]
       
       if (!intraday) {
+        
+        adjclose <- unlist(result_df[["indicators"]][["adjclose"]][[1]], recursive = FALSE)
         index <- as.Date(as.POSIXct(index, tz = tz))
+        
+        result_df <- data.frame(
+          "index" = index,
+          ohlcv,
+          "adjclose" = adjclose
+        )
+        
       } else {
+        
         index <- as.POSIXct(index, tz = tz)
+        
+        result_df <- data.frame(
+          "index" = index,
+          ohlcv
+        )
+        
       }
-      
-      result_df <- data.frame(
-        "index" = index,
-        ohlcv,
-        "adjclose" = adjclose
-      )
       
       result_df <- result_df[ , cols]
       result_ls <- append(result_ls, list(result_df))
@@ -246,12 +260,16 @@ get_data <- function(symbols, from_date = "2007-01-01", to_date = NULL, interval
     
   }
   
-  # if (length(result_ls) == 0) {
-  #   return(data.frame())
-  # }
-  
-  names(result_ls) <- symbols
-  
-  return(result_ls)
+  if (length(result_ls) == 0) {
+    return(data.frame())
+  } else if (length(result_ls) == 1) {
+    return(result_ls[[1]])
+  } else {
+    
+    names(result_ls) <- symbols
+    
+    return(result_ls)
+    
+  }
   
 }
