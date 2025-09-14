@@ -78,7 +78,7 @@ class Check:
     if (interval == "1m") and ((to_date - from_date).days > 8):
       raise ValueError("number of days between 'from_date' and 'to_date' must be less than or equal to 8")
     
-    if ~pd.isna(valid_lookback) and ((pd.Timestamp.now() - from_date).days >= valid_lookback):
+    if ~pd.isna(valid_lookback) and ((pd.Timestamp.today() - from_date).days >= valid_lookback):
       raise ValueError(f"number of days between 'from_date' and today must be less than {valid_lookback}")
 
 class Process:
@@ -287,7 +287,7 @@ def get(symbols, from_date = "2007-01-01", to_date = None, interval = "1d"):
   if (len(result_ls) == 0):
     return pd.DataFrame()
   elif (len(result_ls) == 1):
-    return result_ls[[0]]
+    return result_ls[symbols[0]]
   else:
     return result_ls
   
