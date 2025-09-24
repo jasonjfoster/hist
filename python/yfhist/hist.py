@@ -66,9 +66,9 @@ class Check:
     
   @staticmethod
   def intraday(from_date, to_date, interval):
-  
-    from_date = pd.to_datetime(from_date, format = "%Y-%m-%d")
-    to_date = pd.to_datetime(to_date, format = "%Y-%m-%d")
+    
+    from_date = pd.to_datetime(from_date, utc = True).normalize()
+    to_date = pd.to_datetime(to_date, utc = True).normalize()
     
     valid_lookback = Data.intervals.loc[Data.intervals["field"] == interval, "lookback"].iloc[0]
     
@@ -78,7 +78,8 @@ class Check:
     if (interval == "1m") and ((to_date - from_date).days > 8):
       raise ValueError("number of days between 'from_date' and 'to_date' must be less than or equal to 8")
     
-    if ~pd.isna(valid_lookback) and ((pd.Timestamp.today() - from_date).days >= valid_lookback):
+    today_utc = pd.Timestamp.now(tz = "UTC").normalize()
+    if ~pd.isna(valid_lookback) and ((today_utc - from_date).days >= valid_lookback):
       raise ValueError(f"number of days between 'from_date' and today must be less than {valid_lookback}")
 
 class Process:
@@ -197,7 +198,7 @@ def get(symbols, from_date = "2007-01-01", to_date = None, interval = "1d"):
     symbols = [symbols]
 
   if to_date is None:
-    to_date = pd.Timestamp.now()
+    to_date = pd.Timestamp.now(tz = "UTC")
     
   Check.symbols(symbols)
   Check.date(from_date, "from_date")
@@ -209,9 +210,22 @@ def get(symbols, from_date = "2007-01-01", to_date = None, interval = "1d"):
   cookies = session["cookies"]
   handle = session["handle"]
   
+  intraday = Data.intervals.loc[Data.intervals["field"] == interval, "intraday"].iloc[0]
+  
+  if not intraday:
+    
+    # inclusive end: use midnight after to_date (exclusive bound)
+    to_dt = pd.to_datetime(to_date, utc = True).normalize() + pd.Timedelta(days = 1)
+    period2 = int(to_dt.timestamp())
+    
+  else:
+    
+    # intraday: use exact timestamp
+    period2 = Process.date(to_date)
+        
   params = {
     "period1": Process.date(from_date),
-    "period2": Process.date(to_date),
+    "period2": period2,
     "interval": interval
   }
   
@@ -223,7 +237,6 @@ def get(symbols, from_date = "2007-01-01", to_date = None, interval = "1d"):
     handle.cookies.set(key, value)
   
   count = 0
-  intraday = Data.intervals.loc[Data.intervals["field"] == interval, "intraday"].iloc[0]
   # result_ls = []
   result_ls = {}
   

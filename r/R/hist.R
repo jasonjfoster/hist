@@ -62,7 +62,7 @@ check_intraday <- function(from_date, to_date, interval) {
 }
 
 process_date <- function(date) {
-  as.integer(as.POSIXct(as.Date(date), tz = "UTC"))
+  as.integer(as.POSIXct(date, tz = "UTC"))
 }
 
 process_url <- function(params) {
@@ -164,7 +164,7 @@ get_session <- function() {
 get_data <- function(symbols, from_date = "2007-01-01", to_date = NULL, interval = "1d") {
   
   if (is.null(to_date)) {
-    to_date <- Sys.Date()
+    to_date <- Sys.time()
   }
   
   check_symbols(symbols)
@@ -178,9 +178,24 @@ get_data <- function(symbols, from_date = "2007-01-01", to_date = NULL, interval
   cookies <- session[["cookies"]]
   handle <- session[["handle"]]
   
+  intraday <- yfhist::data_intervals[["intraday"]][yfhist::data_intervals[["field"]] == interval]
+  
+  if (!intraday) {
+    
+    # inclusive end: use midnight after to_date (exclusive bound)
+    to_dt <- as.Date(to_date) + 1
+    period2 <- process_date(to_dt)
+    
+  } else {
+    
+    # intraday: use exact timestamp
+    period2 <- process_date(to_date)
+    
+  }
+  
   params <- list(
     period1 = process_date(from_date),
-    period2 = process_date(to_date),
+    period2 = period2,
     interval = interval
   )
   
@@ -190,7 +205,6 @@ get_data <- function(symbols, from_date = "2007-01-01", to_date = NULL, interval
   )
   
   count <- 0
-  intraday <- yfhist::data_intervals[["intraday"]][yfhist::data_intervals[["field"]] == interval]
   result_ls <- list()
   
   if (!intraday) {
@@ -225,7 +239,7 @@ get_data <- function(symbols, from_date = "2007-01-01", to_date = NULL, interval
       if (!intraday) {
         
         adjclose <- unlist(result_df[["indicators"]][["adjclose"]][[1]], recursive = FALSE)
-        index <- as.Date(as.POSIXct(index, tz = tz))
+        index <- as.Date(as.POSIXct(index, origin = "1970-01-01", tz = "UTC"), tz = tz)
         
         result_df <- data.frame(
           "index" = index,
@@ -235,7 +249,8 @@ get_data <- function(symbols, from_date = "2007-01-01", to_date = NULL, interval
         
       } else {
         
-        index <- as.POSIXct(index, tz = tz)
+        index <- as.POSIXct(index, origin = "1970-01-01", tz = "UTC")
+        index <- as.POSIXct(format(index, tz = tz, usetz = TRUE), tz = tz)
         
         result_df <- data.frame(
           "index" = index,
