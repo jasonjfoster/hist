@@ -1,6 +1,5 @@
 # hist
 
-[![GitHub Actions](https://github.com/jasonjfoster/hist/actions/workflows/check-standard-py.yaml/badge.svg)](https://github.com/jasonjfoster/hist/actions/workflows/check-standard-py.yaml)
 [![codecov](https://codecov.io/gh/jasonjfoster/hist/graph/badge.svg)](https://app.codecov.io/github/jasonjfoster/hist)
 
 ## Overview
