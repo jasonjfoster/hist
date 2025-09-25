@@ -5,7 +5,7 @@ import yfhist as yfh
 
 # @pytest.mark.skip(reason = "long-running test")
 
-symbols = ["AAPL", "MSFT"]
+test_symbols = ["AAPL", "MSFT"]
 
 def test_that(): # valid 'from_date' and 'interval'
 
@@ -30,7 +30,7 @@ def test_that(): # valid 'from_date' and 'interval'
 
     try:
 
-      response = yfh.get_data(symbols, from_date = from_date,
+      response = yfh.get_data(test_symbols, from_date = from_date,
                               interval = field)
       
       if (response is None):

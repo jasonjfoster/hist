@@ -1,5 +1,8 @@
 # hist
 
+[![GitHub Actions](https://github.com/jasonjfoster/hist/actions/workflows/check-standard-py.yaml/badge.svg)](https://github.com/jasonjfoster/hist/actions/workflows/check-standard-py.yaml)
+[![codecov](https://codecov.io/gh/jasonjfoster/hist/graph/badge.svg)](https://app.codecov.io/github/jasonjfoster/hist)
+
 ## Overview
 
 `yfhist` is a package that provides simple and efficient access to Yahoo Finance's historical data API (`/v8/finance/chart/{symbol}`) for querying and retrieval of financial data.
