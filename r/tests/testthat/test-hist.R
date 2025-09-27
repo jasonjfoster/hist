@@ -11,6 +11,10 @@ test_that("valid 'from_date' and 'interval'", {
     lookback <- yfhist::data_intervals[["lookback"]][yfhist::data_intervals[["field"]] == field]
     
     if (is.na(lookback)) {
+      lookback <- NULL
+    }
+    
+    if (is.null(lookback)) {
       from_date <- "2007-01-01"
     } else {
       

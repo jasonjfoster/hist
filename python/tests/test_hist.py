@@ -16,10 +16,12 @@ def test_that(): # valid 'from_date' and 'interval'
   errors_ls = []
 
   for field in fields:
-
-    field = fields[0]
-    lookback = yfh.data_intervals.loc[yfh.data_intervals["field"] == field, "lookback"]
-
+    
+    lookback = yfh.data_intervals.loc[yfh.data_intervals["field"] == field, "lookback"].item()
+    
+    if pd.isna(lookback):
+      lookback = None
+    
     if (lookback is None):
       from_date = "2007-01-01"
     else:
