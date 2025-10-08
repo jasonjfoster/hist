@@ -62,7 +62,10 @@ check_intraday <- function(from_date, to_date, interval) {
 }
 
 process_date <- function(date) {
-  as.integer(as.POSIXct(date, tz = "UTC"))
+  
+  # as.integer(as.POSIXct(date, tz = "UTC")) # 32-bit => overflow
+  trunc(as.numeric(as.POSIXct(date, tz = "UTC"))) # 64-bit
+  
 }
 
 process_url <- function(params) {
@@ -183,7 +186,7 @@ get_data <- function(symbols, from_date = "2007-01-01", to_date = NULL, interval
   if (!intraday) {
     
     # inclusive end: use midnight after to_date (exclusive bound)
-    to_dt <- as.Date(to_date) + 1
+    to_dt <- as.Date(to_date, tz = "UTC") + 1
     period2 <- process_date(to_dt)
     
   } else {

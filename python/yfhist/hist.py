@@ -87,7 +87,7 @@ class Process:
   @staticmethod
   def date(date):
   
-    result = int(pd.to_datetime(date, utc = True).timestamp())
+    result = int(pd.to_datetime(date, utc = True).timestamp()) # 64-bit
     
     return result
   
