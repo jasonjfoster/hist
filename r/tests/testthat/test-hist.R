@@ -28,8 +28,12 @@ test_that("valid 'from_date' and 'interval'", {
     
     response <- tryCatch({
       
-      response <- suppressWarnings(get_data(test_symbols, from_date = from_date,
-                                            interval = field))
+      data <- suppressWarnings(get_data(test_symbols, from_date = from_date,
+                                        interval = field))
+      
+      for (i in 1:length(test_cols)) {
+        response <- get_col(data, test_cols[i])
+      }
       
       if (is.null(response)) {
         response <- "success"
