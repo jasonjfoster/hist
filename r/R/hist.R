@@ -61,6 +61,16 @@ check_intraday <- function(from_date, to_date, interval) {
   
 }
 
+check_col <- function(col) {
+  
+  valid_col <- c("open", "high", "low", "close", "adjclose", "volume")
+  
+  if (!col %in% valid_col) {
+    stop("invalid 'col'")
+  }
+  
+}
+
 process_date <- function(date) {
   
   # as.integer(as.POSIXct(date, tz = "UTC")) # 32-bit => overflow
@@ -304,26 +314,34 @@ get_data <- function(symbols, from_date = "2007-01-01", to_date = NULL, interval
 ##'
 ##' @examples
 ##' \dontrun{
-##' data <- get_data(c("AAPL", "MSFT", "AMZN"))
+##' data <- get_data(c("AAPL", "MSFT"))
 ##' 
 ##' adjclose <- get_col(data, "adjclose")
 ##' }
 ##' @export
 get_col <- function(data, col) {
   
-  symbols <- names(data)
+  check_col(col)
   
-  series_ls <- lapply(symbols, function(symbol) {
+  if (is.data.frame(data)) {
+    result <- data[ , c("index", col)]
+  } else if (is.list(data)) {
     
-    df <- data[[symbol]]
-    df <- df[ , c("index", col)]
-    colnames(df) <- c("index", symbol)
+    symbols <- names(data)
     
-    df
+    series_ls <- lapply(symbols, function(symbol) {
+      
+      df <- data[[symbol]]
+      df <- df[ , c("index", col)]
+      colnames(df) <- c("index", symbol)
+      
+      df
+      
+    })
     
-  })
-  
-  result <- Reduce(function(x, y) merge(x, y, by = "index", all = TRUE), series_ls)
+    result <- Reduce(function(x, y) merge(x, y, by = "index", all = TRUE), series_ls)
+    
+  }
   
   return(result)
   

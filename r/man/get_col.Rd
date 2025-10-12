@@ -21,7 +21,7 @@ range and interval.
 }
 \examples{
 \dontrun{
-data <- get_data(c("AAPL", "MSFT", "AMZN"))
+data <- get_data(c("AAPL", "MSFT"))
 
 adjclose <- get_col(data, "adjclose")
 }
