@@ -35,11 +35,11 @@ test_that("valid 'from_date' and 'interval'", {
         response <- get_col(data, test_cols[i])
       }
       
-      if (is.null(response)) {
-        response <- "success"
-      } else {
-        response
-      }
+      # if (is.null(response)) {
+      #   response <- "success"
+      # } else {
+      response
+      # }
       
     }, error = function(e) {
       NULL

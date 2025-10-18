@@ -35,8 +35,8 @@ def test_that(): # valid 'from_date' and 'interval'
       response = yfh.get_data(test_symbols, from_date = from_date,
                               interval = field)
       
-      if (response is None):
-        response = "success"
+      # if (response is None):
+      #   response = "success"
         
     except:
       response = None
