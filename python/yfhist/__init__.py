@@ -1,4 +1,4 @@
-from .hist import Data, Check, Process, Env, Session
+from .hist import Data, Check, Process, Env, Session, Col
 
 __version__ = "0.1.0"
 
@@ -11,6 +11,7 @@ process_date = Process.date
 with_env = Env.with_
 get_session = Session.get
 get_data = Data.get
+get_col = Col.get
 
 __all__ = [
     "Data", "data_intervals",
@@ -18,5 +19,6 @@ __all__ = [
     "Process", "process_date", # "process_url"
     "Env", "with_env",
     "Session", "get_session",
-    "get_data"
+    "get_data",
+    "Col", "get_col"
 ]

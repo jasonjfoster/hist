@@ -303,5 +303,53 @@ def get(symbols, from_date = "2007-01-01", to_date = None, interval = "1d"):
     return result_ls[symbols[0]]
   else:
     return result_ls
+
+class Col:
   
+  @staticmethod
+  def get(data, col):
+    """
+    Get a Column from the Yahoo Finance API
+  
+    A method to get a column from the Yahoo Finance API for symbols using a date
+    range and interval.
+  
+    Parameters:
+      data (data frame or dict of data frames): data that contains an \code{index} column
+      and the requested column created using the \code{\link{get_data}} method.
+      col (str): column name to get (i.e., "open", "high", "low", "close", "adjclose", "volume").
+  
+    Returns:
+      A data frame with rows as the \code{index} and columns as the symbols.
+      
+    Examples:
+      data = yfh.get_data(["AAPL", "MSFT"])
+      adj = yfh.get_col(data, "adjclose")
+    """
+    
+    if isinstance(data, pd.DataFrame):
+      
+      result = data.loc[:, ["index", col]].copy()
+      result["index"] = pd.to_datetime(result["index"])
+      
+      # result = result.set_index("index")[[col]]
+      
+    elif (isinstance(data, dict)):
+      
+      series_ls = []
+    
+      for symbol, df in data.items():
+    
+        df = df.loc[:, ["index", col]].copy()
+        df["index"] = pd.to_datetime(df["index"])
+    
+        df = df.set_index("index")[col]
+        df.name = symbol
+    
+        series_ls.append(df)
+    
+      result = pd.concat(series_ls, axis = 1)
+  
+    return result
+
 Data.get = get

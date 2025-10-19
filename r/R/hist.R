@@ -316,7 +316,7 @@ get_data <- function(symbols, from_date = "2007-01-01", to_date = NULL, interval
 ##' \dontrun{
 ##' data <- get_data(c("AAPL", "MSFT"))
 ##' 
-##' adjclose <- get_col(data, "adjclose")
+##' adj <- get_col(data, "adjclose")
 ##' }
 ##' @export
 get_col <- function(data, col) {
