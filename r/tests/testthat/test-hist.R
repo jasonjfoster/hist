@@ -19,51 +19,61 @@ test_that("valid 'from_date' and 'interval'", {
     } else {
       
       if (field == "1m") {
-        from_date <- Sys.Date() - 8
+        
+        to_date <- Sys.time()
+        from_date <- as.POSIXct(to_date - 8 * 24 * 3600, tz = "UTC")
+        
       } else {
+        
+        to_date <- NULL
         from_date <- Sys.Date() - lookback + 1
+        
       }
       
     }
     
-    response <- tryCatch({
+    for (symbols in test_symbols) {
       
-      data <- suppressWarnings(get_data(test_symbols, from_date = from_date,
-                                        interval = field))
+      response <- tryCatch({
+        
+        data <- suppressWarnings(get_data(symbols, from_date = from_date,
+                                          to_date = to_date, interval = field))
+        
+        for (col in test_cols) {
+          response <- get_col(data, col)
+        }
+        
+        # if (is.null(response)) {
+        #   response <- "success"
+        # } else {
+        response
+        # }
+        
+      }, error = function(e) {
+        NULL
+      })
       
-      for (i in 1:length(test_cols)) {
-        response <- get_col(data, test_cols[i])
+      if (is.null(response)) {
+        
+        error <- data.frame(
+          field = field
+        )
+        
+        errors_ls <- append(errors_ls, list(error))
+        
       }
       
-      # if (is.null(response)) {
-      #   response <- "success"
-      # } else {
-      response
-      # }
+      count <- count + 1
       
-    }, error = function(e) {
-      NULL
-    })
-    
-    if (is.null(response)) {
-      
-      error <- data.frame(
-        field = field
-      )
-    
-      error_ls <- append(errors_ls, list(error))
+      if (count %% 5 == 0) {
+        
+        message("pause one second after five requests")
+        Sys.sleep(1)
+        
+      }
       
     }
     
-    count <- count + 1
-    
-    if (count %% 5 == 0) {
-      
-      message("pause one second after five requests")
-      Sys.sleep(1)
-      
-    }
-  
   }
   
   if (length(errors_ls) > 0) {

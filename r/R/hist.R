@@ -42,20 +42,26 @@ check_interval <- function(interval) {
 
 check_intraday <- function(from_date, to_date, interval) {
   
-  from_date <- as.Date(from_date)
-  to_date <- as.Date(to_date)
+  from_d <- as.Date(from_date)
+  to_d <- as.Date(to_date)
   
   valid_lookback <- yfhist::data_intervals[["lookback"]][yfhist::data_intervals[["field"]] == interval]
   
-  if (to_date - from_date <= 0) {
+  if (to_d - from_d <= 0) {
     stop("value of 'to_date' must be greater than 'from_date'")
   }
   
-  if ((interval == "1m") && (to_date - from_date > 8)) {
-    stop("number of days between 'from_date' and 'to_date' must be less than or equal to 8")
+  if (interval == "1m") {
+    
+    n_secs <- as.numeric(as.POSIXct(to_date, tz = "UTC") - as.POSIXct(from_date, tz = "UTC"))
+    
+    if (n_secs > 8 * 24 * 3600) {
+      stop("number of days between 'from_date' and 'to_date' must be less than or equal to 8")
+    }
+    
   }
   
-  if (!is.na(valid_lookback) && (Sys.Date() - from_date >= valid_lookback)) {
+  if (!is.na(valid_lookback) && (Sys.Date() - from_d >= valid_lookback)) {
     stop(paste0("number of days between 'from_date' and today must be less than ", valid_lookback))
   }
   
@@ -68,6 +74,27 @@ check_col <- function(col) {
   if (!col %in% valid_col) {
     stop("invalid 'col'")
   }
+  
+}
+
+check_adjclose <- function(data, col) {
+  
+  valid_col <- colnames(data)
+  
+  if ((col == "adjclose") && (!col %in% valid_col)) {
+    if ("close" %in% valid_col) {
+    
+      warning("'adjclose' not found; using 'close' (intraday data)")
+      result <- "close"
+      
+    } else {
+      stop("'adjclose' and 'close' not found")
+    }
+  } else {
+    result <- col
+  }
+  
+  return(result)
   
 }
 
@@ -324,7 +351,10 @@ get_col <- function(data, col) {
   check_col(col)
   
   if (is.data.frame(data)) {
+    
+    col <- check_adjclose(data, col)
     result <- data[ , c("index", col)]
+    
   } else if (is.list(data)) {
     
     symbols <- names(data)
@@ -332,6 +362,7 @@ get_col <- function(data, col) {
     series_ls <- lapply(symbols, function(symbol) {
       
       df <- data[[symbol]]
+      col <- check_adjclose(df, col)
       df <- df[ , c("index", col)]
       colnames(df) <- c("index", symbol)
       

@@ -23,6 +23,6 @@ range and interval.
 \dontrun{
 data <- get_data(c("AAPL", "MSFT"))
 
-adjclose <- get_col(data, "adjclose")
+adj <- get_col(data, "adjclose")
 }
 }
