@@ -42,12 +42,12 @@ check_interval <- function(interval) {
 
 check_intraday <- function(from_date, to_date, interval) {
   
-  from_d <- as.Date(from_date)
-  to_d <- as.Date(to_date)
+  from_date0 <- as.Date(from_date)
+  to_date0 <- as.Date(to_date)
   
   valid_lookback <- yfhist::data_intervals[["lookback"]][yfhist::data_intervals[["field"]] == interval]
   
-  if (to_d - from_d <= 0) {
+  if (to_date0 - from_date0 <= 0) {
     stop("value of 'to_date' must be greater than 'from_date'")
   }
   
@@ -61,7 +61,7 @@ check_intraday <- function(from_date, to_date, interval) {
     
   }
   
-  if (!is.na(valid_lookback) && (Sys.Date() - from_d >= valid_lookback)) {
+  if (!is.na(valid_lookback) && (Sys.Date() - from_date0 >= valid_lookback)) {
     stop(paste0("number of days between 'from_date' and today must be less than ", valid_lookback))
   }
   

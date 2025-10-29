@@ -56,6 +56,7 @@ test_that("valid 'from_date' and 'interval'", {
       if (is.null(response)) {
         
         error <- data.frame(
+          symbols = paste(symbols, collapse = ","),
           field = field
         )
         

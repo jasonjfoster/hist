@@ -4,6 +4,7 @@ import requests
 import pandas as pd
 import importlib.resources as pkg_resources
 import contextlib
+import warnings
 
 class ClassProperty:
   
@@ -52,7 +53,7 @@ class Check:
   def date(date, type):
   
     try:
-      pd.to_datetime(date, format = "%Y-%m-%d")
+      pd.to_datetime(date)
     except ValueError:
       raise ValueError(f"invalid '{type}'")
     
@@ -67,20 +68,54 @@ class Check:
   @staticmethod
   def intraday(from_date, to_date, interval):
     
-    from_date = pd.to_datetime(from_date, utc = True).normalize()
-    to_date = pd.to_datetime(to_date, utc = True).normalize()
+    from_date = pd.to_datetime(from_date, utc = True)
+    to_date = pd.to_datetime(to_date, utc = True)
+    
+    from_date0 = from_date.normalize()
+    to_date0 = to_date.normalize()
     
     valid_lookback = Data.intervals.loc[Data.intervals["field"] == interval, "lookback"].iloc[0]
     
-    if (to_date - from_date).days <= 0:
+    if (to_date0 - from_date0).days <= 0:
       raise ValueError("value of 'to_date' must be greater than 'from_date'")
     
-    if (interval == "1m") and ((to_date - from_date).days > 8):
-      raise ValueError("number of days between 'from_date' and 'to_date' must be less than or equal to 8")
+    if interval == "1m":
+      
+        n_secs = (to_date - from_date).total_seconds()
+        
+        if n_secs > 8 * 24 * 3600:
+            raise ValueError("number of days between 'from_date' and 'to_date' must be less than or equal to 8")
     
     today_utc = pd.Timestamp.now(tz = "UTC").normalize()
-    if ~pd.isna(valid_lookback) and ((today_utc - from_date).days >= valid_lookback):
+    if (not pd.isna(valid_lookback)) and ((today_utc - from_date0).days >= valid_lookback):
       raise ValueError(f"number of days between 'from_date' and today must be less than {valid_lookback}")
+  
+  @staticmethod
+  def col(col):
+    
+    valid_col = ["open", "high", "low", "close", "adjclose", "volume"]
+    
+    if col not in valid_col:
+      raise ValueError("invalid 'col'")
+  
+  @staticmethod
+  def adjclose(data, col):
+    
+    valid_col = data.columns
+    
+    if ((col == "adjclose") and (col not in valid_col)):
+      if ("close" in valid_col):
+        
+        warnings.warn("'adjclose' not found; using 'close' (intraday data)", UserWarning)
+        result = "close"
+      
+      else:
+        raise KeyError("'adjclose' and 'close' not found")
+    
+    else:
+      result = col
+      
+    return result
 
 class Process:
   
@@ -329,27 +364,31 @@ class Col:
     
     if isinstance(data, pd.DataFrame):
       
+      col = Check.adjclose(data, col)
+      
       result = data.loc[:, ["index", col]].copy()
       result["index"] = pd.to_datetime(result["index"])
-      
-      # result = result.set_index("index")[[col]]
       
     elif (isinstance(data, dict)):
       
       series_ls = []
     
       for symbol, df in data.items():
+        
+        col = Check.adjclose(df, col)
     
         df = df.loc[:, ["index", col]].copy()
         df["index"] = pd.to_datetime(df["index"])
-    
-        df = df.set_index("index")[col]
-        df.name = symbol
+        df.columns = ["index", symbol]
     
         series_ls.append(df)
     
-      result = pd.concat(series_ls, axis = 1)
-  
+      # result = pd.concat(series_ls, axis = 1)
+      
+      result = series_ls[0]
+      for i in range(1, len(series_ls)):
+        result = result.merge(series_ls[i], on = "index", how = "outer")
+                
     return result
 
 Data.get = get
