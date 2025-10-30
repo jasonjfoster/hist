@@ -5,7 +5,7 @@ import yfhist as yfh
 
 # @pytest.mark.skip(reason = "long-running test")
 
-test_symbols = [["AAPL"], ["AAPL", "MSFT"], ["AAPL", "MSFT", "AMZN"]]
+test_symbols = ["AAPL", ["AAPL", "MSFT"], ["AAPL", "MSFT", "AMZN"]]
 test_cols = ["open", "high", "low", "close", "adjclose", "volume"]
 
 def test_that(): # valid 'from_date' and 'interval'
