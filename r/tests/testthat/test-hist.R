@@ -14,22 +14,16 @@ test_that("valid 'from_date' and 'interval'", {
       lookback <- NULL
     }
     
+    to_date <- as.POSIXct(Sys.time(), tz = "UTC")
+    
     if (is.null(lookback)) {
       from_date <- "2007-01-01"
     } else {
-      
       if (field == "1m") {
-        
-        to_date <- Sys.time()
         from_date <- as.POSIXct(to_date - 8 * 24 * 3600, tz = "UTC")
-        
       } else {
-        
-        to_date <- NULL
-        from_date <- Sys.Date() - lookback + 1
-        
+        from_date <- as.POSIXct(to_date - (lookback - 1) * 24 * 3600, tz = "UTC")
       }
-      
     }
     
     for (symbols in test_symbols) {

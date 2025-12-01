@@ -42,27 +42,44 @@ check_interval <- function(interval) {
 
 check_intraday <- function(from_date, to_date, interval) {
   
-  from_date0 <- as.Date(from_date)
-  to_date0 <- as.Date(to_date)
+  from_date <- as.POSIXct(from_date, tz = "UTC")
+  to_date <- as.POSIXct(to_date, tz = "UTC")
   
-  valid_lookback <- yfhist::data_intervals[["lookback"]][yfhist::data_intervals[["field"]] == interval]
-  
-  if (to_date0 - from_date0 <= 0) {
+  if (to_date <= from_date) {
     stop("value of 'to_date' must be greater than 'from_date'")
   }
   
-  if (interval == "1m") {
+  valid_lookback <- yfhist::data_intervals[["lookback"]][yfhist::data_intervals[["field"]] == interval]
+  valid_intraday <- yfhist::data_intervals[["intraday"]][yfhist::data_intervals[["field"]] == interval]
+  
+  if (valid_intraday) {
     
-    n_secs <- as.numeric(as.POSIXct(to_date, tz = "UTC") - as.POSIXct(from_date, tz = "UTC"))
+    n_secs <- as.numeric(to_date - from_date)
     
-    if (n_secs > 8 * 24 * 3600) {
-      stop("number of days between 'from_date' and 'to_date' must be less than or equal to 8")
+    if (interval == "1m") {
+      
+      max_secs <- 8 * 24 * 3600
+      
+      if (n_secs > max_secs) {
+        stop("number of days between 'from_date' and 'to_date' must be less than or equal to 8")
+      }
+      
+      n_days <- as.numeric(Sys.Date() - as.Date(from_date))
+      
+      if (n_days > valid_lookback) {
+        stop(paste0("number of days between 'from_date' and today must be less than ", valid_lookback))
+      }
+      
+    } else {
+      
+      max_secs <- valid_lookback * 24 * 3600
+      
+      if (n_secs > max_secs) {
+        stop(paste0("number of days between 'from_date' and 'to_date' must be less than ", valid_lookback))
+      }
+      
     }
     
-  }
-  
-  if (!is.na(valid_lookback) && (Sys.Date() - from_date0 >= valid_lookback)) {
-    stop(paste0("number of days between 'from_date' and today must be less than ", valid_lookback))
   }
   
 }
@@ -245,6 +262,7 @@ get_data <- function(symbols, from_date = "2007-01-01", to_date = NULL, interval
   )
   
   count <- 0
+  symbols_ls <- character()
   result_ls <- list()
   
   if (!intraday) {
@@ -300,6 +318,8 @@ get_data <- function(symbols, from_date = "2007-01-01", to_date = NULL, interval
       }
       
       result_df <- result_df[ , cols]
+      
+      symbols_ls <- c(symbols_ls, symbol)
       result_ls <- append(result_ls, list(result_df))
       
     }
@@ -318,10 +338,15 @@ get_data <- function(symbols, from_date = "2007-01-01", to_date = NULL, interval
   if (length(result_ls) == 0) {
     return(data.frame())
   } else if (length(result_ls) == 1) {
-    return(result_ls[[1]])
+    
+    df <- result_ls[[1]]
+    attr(df, "symbol") <- symbols_ls[[1]]
+    
+    return(df)
+    
   } else {
     
-    names(result_ls) <- symbols
+    names(result_ls) <- symbols_ls
     
     return(result_ls)
     
@@ -352,8 +377,12 @@ get_col <- function(data, col) {
   
   if (is.data.frame(data)) {
     
-    col <- check_adjclose(data, col)
-    result <- data[ , c("index", col)]
+    col_i <- check_adjclose(data, col)
+    
+    result <- data[ , c("index", col_i)]
+    
+    symbol <- attr(data, "symbol")
+    colnames(result) <- c("index", symbol)
     
   } else if (is.list(data)) {
     
@@ -362,8 +391,8 @@ get_col <- function(data, col) {
     series_ls <- lapply(symbols, function(symbol) {
       
       df <- data[[symbol]]
-      col <- check_adjclose(df, col)
-      df <- df[ , c("index", col)]
+      col_i <- check_adjclose(df, col)
+      df <- df[ , c("index", col_i)]
       colnames(df) <- c("index", symbol)
       
       df

@@ -23,18 +23,15 @@ def test_that(): # valid 'from_date' and 'interval'
     if pd.isna(lookback):
       lookback = None
     
+    to_date = pd.Timestamp.now(tz = "UTC")
+    
     if (lookback is None):
       from_date = "2007-01-01"
     else:
       if (field == "1m"):
-        
-        to_date = pd.Timestamp.now(tz = "UTC")
         from_date = to_date - pd.Timedelta(days = 8)
-        
       else:
-        
-        to_date = None
-        from_date = (pd.Timestamp.today().normalize() - pd.Timedelta(days = int(lookback) - 1))
+        from_date = to_date - pd.Timedelta(days = int(lookback) - 1)
 
     for symbols in test_symbols:
       
@@ -55,7 +52,8 @@ def test_that(): # valid 'from_date' and 'interval'
       if response is None:
   
         errors_ls.append({
-          "symbols": ", ".join(symbols),
+          "symbols": symbols if isinstance(symbols, str) else ", ".join(symbols),
+          # "symbols": ", ".join(symbols),
           "field": field
         })
   

@@ -70,25 +70,37 @@ class Check:
     
     from_date = pd.to_datetime(from_date, utc = True)
     to_date = pd.to_datetime(to_date, utc = True)
-    
-    from_date0 = from_date.normalize()
-    to_date0 = to_date.normalize()
-    
-    valid_lookback = Data.intervals.loc[Data.intervals["field"] == interval, "lookback"].iloc[0]
-    
-    if (to_date0 - from_date0).days <= 0:
+  
+    if to_date <= from_date:
       raise ValueError("value of 'to_date' must be greater than 'from_date'")
     
-    if interval == "1m":
-      
-        n_secs = (to_date - from_date).total_seconds()
-        
-        if n_secs > 8 * 24 * 3600:
-            raise ValueError("number of days between 'from_date' and 'to_date' must be less than or equal to 8")
+    valid_lookback = Data.intervals.loc[Data.intervals["field"] == interval, "lookback"].iloc[0]
+    valid_intraday = Data.intervals.loc[Data.intervals["field"] == interval, "intraday"].iloc[0]
     
-    today_utc = pd.Timestamp.now(tz = "UTC").normalize()
-    if (not pd.isna(valid_lookback)) and ((today_utc - from_date0).days >= valid_lookback):
-      raise ValueError(f"number of days between 'from_date' and today must be less than {valid_lookback}")
+    if bool(valid_intraday):
+      
+      n_secs = (to_date - from_date).total_seconds()
+    
+      if interval == "1m":
+        
+        max_secs = 8 * 24 * 3600
+        
+        if n_secs > max_secs:
+          raise ValueError("number of days between 'from_date' and 'to_date' must be less than or equal to 8")
+        
+        today_utc = pd.Timestamp.now(tz = "UTC").normalize()
+        from_date0 = from_date.normalize()
+        n_days = (today_utc - from_date0).days
+        
+        if n_days > valid_lookback:
+          raise ValueError(f"number of days between 'from_date' and today must be less than {valid_lookback}")
+      
+      else:
+        
+        max_secs = valid_lookback * 24 * 3600
+        
+        if n_secs > max_secs:
+          raise ValueError(f"number of days between 'from_date' and 'to_date' must be less than {valid_lookback}")
   
   @staticmethod
   def col(col):
@@ -272,6 +284,7 @@ def get(symbols, from_date = "2007-01-01", to_date = None, interval = "1d"):
     handle.cookies.set(key, value)
   
   count = 0
+  symbols_ls = []
   # result_ls = []
   result_ls = {}
   
@@ -322,6 +335,8 @@ def get(symbols, from_date = "2007-01-01", to_date = None, interval = "1d"):
         })
       
       result_df = result_df[cols]
+      
+      symbols_ls.append(symbol)
       # result_ls.append(result_df)
       result_ls[symbol] = result_df
 
@@ -335,7 +350,14 @@ def get(symbols, from_date = "2007-01-01", to_date = None, interval = "1d"):
   if (len(result_ls) == 0):
     return pd.DataFrame()
   elif (len(result_ls) == 1):
-    return result_ls[symbols[0]]
+    
+    symbol = symbols_ls[0]
+    
+    df = result_ls[symbol].copy()
+    df.attrs["symbol"] = symbol
+    
+    return df
+  
   else:
     return result_ls
 
@@ -364,20 +386,22 @@ class Col:
     
     if isinstance(data, pd.DataFrame):
       
-      col = Check.adjclose(data, col)
+      col_i = Check.adjclose(data, col)
       
-      result = data.loc[:, ["index", col]].copy()
+      result = data.loc[:, ["index", col_i]].copy()
       result["index"] = pd.to_datetime(result["index"])
+      
+      symbol = data.attrs.get("symbol", col_i)
+      result.columns = ["index", symbol]
       
     elif (isinstance(data, dict)):
       
       series_ls = []
-    
+      
       for symbol, df in data.items():
         
-        col = Check.adjclose(df, col)
-    
-        df = df.loc[:, ["index", col]].copy()
+        col_i = Check.adjclose(df, col)
+        df = df.loc[:, ["index", col_i]].copy()
         df["index"] = pd.to_datetime(df["index"])
         df.columns = ["index", symbol]
     
@@ -386,6 +410,7 @@ class Col:
       # result = pd.concat(series_ls, axis = 1)
       
       result = series_ls[0]
+      
       for i in range(1, len(series_ls)):
         result = result.merge(series_ls[i], on = "index", how = "outer")
                 
