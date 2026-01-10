@@ -1,4 +1,6 @@
 test_that("valid 'from_date' and 'interval'", {
+
+  # skip("long-running test")
   
   fields <- yfhist::data_intervals[["field"]]
   
