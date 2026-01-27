@@ -6,9 +6,9 @@
 
 ## Overview
 
-'hist' is a package that provides simple and efficient access to Yahoo Finance's 'history' API <https://finance.yahoo.com/> for querying and retrieval of financial data.
+'yfhist' is a package that provides simple and efficient access to Yahoo Finance's 'history' API <https://finance.yahoo.com/> for querying and retrieval of financial data.
 
-The core functionality of the 'hist' package abstracts the complexities of interacting with Yahoo Finance APIs, such as session management, crumb and cookie handling, query construction, date validation, and interval management. This abstraction allows users to focus on retrieving data rather than managing API details. Use cases include historical data across a range of security types:
+The core functionality of the 'yfhist' package abstracts the complexities of interacting with Yahoo Finance APIs, such as session management, crumb and cookie handling, query construction, date validation, and interval management. This abstraction allows users to focus on retrieving data rather than managing API details. Use cases include historical data across a range of security types:
 
 * **Equities & ETFs**: end-of-day or intraday Open, High, Low, Close, Volume (OHLCV), and adjusted close prices
 * **Indices**: levels over time for benchmarking and research
