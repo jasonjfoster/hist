@@ -17,7 +17,7 @@ The core functionality of the 'yfhist' package abstracts the complexities of int
 
 The package supports flexible query capabilities, including customizable date ranges, multiple time intervals, and automatic data validation. It automatically manages interval-specific limitations, such as lookback periods for intraday data and maximum date ranges for minute-level intervals.
 
-The implementation leverages standard HTTP libraries to handle API interactions efficiently and provides support for both R and 'Python' to ensure accessibility for a broad audience.
+The implementation uses standard HTTP libraries to handle API interactions efficiently and supports both R and 'Python' to ensure accessibility for a broad audience.
 
 ## Installation
 
