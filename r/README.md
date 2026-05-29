@@ -48,3 +48,4 @@ Then, to retrieve historical data, use the `get_data()` function:
 
 ```r
 data <- get_data(c("AAPL", "MSFT"))
+```
