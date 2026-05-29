@@ -44,8 +44,7 @@ library(yfhist)
 print(data_intervals)
 ```
 
-Then, to retrieve historical data, use the the `get_data` function:
+Then, to retrieve historical data, use the `get_data()` function:
 
 ```r
 data <- get_data(c("AAPL", "MSFT"))
-```

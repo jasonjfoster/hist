@@ -42,7 +42,7 @@ import yfhist as yfh
 print(yfh.data_intervals)
 ```
 
-Then, to retrieve historical data, use the the `get_data` method:
+Then, to retrieve historical data, use the `get_data()` method:
 
 ```python
 data = yfh.get_data(["AAPL", "MSFT"])
