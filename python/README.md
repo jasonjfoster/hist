@@ -34,7 +34,7 @@ pip install git+https://github.com/jasonjfoster/hist.git@main#subdirectory=pytho
 
 ## Usage
 
-First, load the package and explore the available interval options:
+First, import the package and explore the available interval options:
 
 ```python
 import yfhist as yfh

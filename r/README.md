@@ -30,8 +30,8 @@ install.packages("yfhist")
 * Or the development version from GitHub:
 
 ```r
-# install.packages("devtools")
-devtools::install_github("jasonjfoster/hist/r")
+# install.packages("pak")
+pak::pak("jasonjfoster/hist/r")
 ```
 
 ## Usage
