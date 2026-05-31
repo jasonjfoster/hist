@@ -190,9 +190,9 @@ class Session:
         - "handle" (requests.Session): a session handle object for subsequent requests.
         - "crumb" (str): a string representing the crumb value for authentication.
         - "cookies" (dict): a data frame of cookies for the request.
-        
-      Examples:
-        session = screen.get_session()
+
+    Examples:
+      session = yfh.get_session()
     """
     
     session = requests.Session()
@@ -231,7 +231,7 @@ def get(symbols, from_date = "2007-01-01", to_date = None, interval = "1d"):
     symbols (str or list of str): symbol or list of symbols.
     from_date (str): start date in "YYYY-MM-DD" format (e.g., "2007-01-01").
     to_date (str): end date in "YYYY-MM-DD" format.
-    interval (str): data interval (see ``data_intervals``).
+    interval (str): data interval (see `data_intervals`).
 
   Returns:
     A data frame or dict of data frames that contains data from the
@@ -372,12 +372,12 @@ class Col:
     range and interval.
   
     Parameters:
-      data (data frame or dict of data frames): data that contains an \code{index} column
-      and the requested column created using the \code{\link{get_data}} method.
+      data (data frame or dict of data frames): data that contains an `index` column
+        and the requested column created using the `get_data` method.
       col (str): column name to get (i.e., "open", "high", "low", "close", "adjclose", "volume").
-  
+
     Returns:
-      A data frame with rows as the \code{index} and columns as the symbols.
+      A data frame with rows as the `index` and columns as the symbols.
       
     Examples:
       data = yfh.get_data(["AAPL", "MSFT"])
