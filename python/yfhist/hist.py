@@ -189,7 +189,7 @@ class Session:
       A dictionary containing the following elements:
         - "handle" (requests.Session): a session handle object for subsequent requests.
         - "crumb" (str): a string representing the crumb value for authentication.
-        - "cookies" (dict): a data frame of cookies for the request.
+        - "cookies" (dict): a dictionary of cookies for the request.
 
     Examples:
       session = yfh.get_session()
@@ -368,8 +368,7 @@ class Col:
     """
     Get a Column from the Yahoo Finance API
   
-    A method to get a column from the Yahoo Finance API for symbols using a date
-    range and interval.
+    A method to get a column from data retrieved from the Yahoo Finance API.
   
     Parameters:
       data (data frame or dict of data frames): data that contains an `index` column

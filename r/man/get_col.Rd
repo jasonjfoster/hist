@@ -16,8 +16,7 @@ the requested column created using the \code{\link{get_data}} function.}
 A data frame with rows as the \code{index} and columns as the symbols.
 }
 \description{
-A function to get a column from the Yahoo Finance API for symbols using a date 
-range and interval.
+A function to get a column from data retrieved from the Yahoo Finance API.
 }
 \examples{
 \dontrun{

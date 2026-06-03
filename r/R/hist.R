@@ -356,8 +356,7 @@ get_data <- function(symbols, from_date = "2007-01-01", to_date = NULL, interval
 
 ##' Get a Column from the Yahoo Finance API
 ##'
-##' A function to get a column from the Yahoo Finance API for symbols using a date 
-##' range and interval.
+##' A function to get a column from data retrieved from the Yahoo Finance API.
 ##'
 ##' @param data data frame or list. Data that contains an \code{index} column and
 ##' the requested column created using the \code{\link{get_data}} function.

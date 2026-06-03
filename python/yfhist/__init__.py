@@ -1,6 +1,6 @@
 from .hist import Data, Check, Process, Env, Session, Col
 
-__version__ = "0.1.0"
+__version__ = "0.1.4"
 
 data_intervals = Data.intervals
 check_symbols = Check.symbols

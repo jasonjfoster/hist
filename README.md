@@ -8,7 +8,7 @@ The 'hist' package abstracts the complexities of interacting with Yahoo Finance 
 
 * **Equities and ETFs**: end-of-day or intraday Open, High, Low, Close, Volume (OHLCV), and adjusted close prices
 * **Indices**: levels over time for benchmarking and research
-* **Other tickers** supported by Yahoo Finance where chart data is available
+* **Other tickers**: additional symbols supported by Yahoo Finance where chart data is available
 
 The package supports flexible query capabilities, including customizable date ranges, multiple time intervals, and automatic data validation. It manages interval-specific limitations automatically, such as lookback periods for intraday data and maximum date ranges for minute-level intervals.
 
