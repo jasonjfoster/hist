@@ -17,7 +17,7 @@ jobs:
         working-directory: ./python # mirrors R's working-directory './r'
 
     steps:
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
         with:
