@@ -1,11 +1,11 @@
-# Python version of the usethis-generated test-coverage.yaml (no official Python coverage templated)
+# Python version of the usethis-generated test-coverage.yaml (no official Python coverage template)
 # Need help debugging build failures? Start at https://docs.github.com/en/actions
 on:
   push:
     branches: [main, master]
   pull_request:
 
-name: test-coverage-py
+name: test-coverage-py.yaml
 
 permissions: read-all
 
@@ -14,15 +14,15 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./python # mirrors R's working-directory './r'
+        working-directory: ./python # mirrors R's working-directory: './r'
 
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.14' # mirrors R 'release'
-      
+          python-version: '3.14'  # mirrors R 'release'
+
       # mirrors R's `Install dependencies`: install_deps(dependencies = TRUE) + covr + xml2
       - name: Install dependencies
         run: |
@@ -30,7 +30,7 @@ jobs:
           pip install -r requirements.txt
           pip install .
           pip install coverage pytest # covr + xml2 equivalent (coverage produces Cobertura XML)
-      
+
       # mirrors R's `Test coverage`: package_coverage() -> print(cov) -> to_cobertura(cov)
       - name: Test coverage
         run: |
@@ -46,12 +46,12 @@ jobs:
           plugins: noop
           disable_search: true
           token: ${{ secrets.CODECOV_TOKEN }}
-      
+
       # mirrors R's `Show testthat output`: surface the test log unconditionally
       - name: Show pytest output
         if: always()
         run: cat .pytest_cache/v/cache/lastfailed || true
-      
+
       # mirrors R's `Upload test results` on failure
       - name: Upload test results
         if: failure()
