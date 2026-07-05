@@ -1,8 +1,8 @@
-##' Intervals Data for the Yahoo Finance API
-##'
-##' A data frame with the available intervals data for the Yahoo Finance API.
-##'
-##' @format A data frame.
+#' Intervals Data for the Yahoo Finance API
+#'
+#' A data frame with the available intervals data for the Yahoo Finance API.
+#'
+#' @format A data frame.
 "data_intervals"
 
 check_symbols <- function(symbols) {
@@ -158,18 +158,18 @@ with_env <- function(new_env, code) {
   
 }
 
-##' Get the Crumb, Cookies, and Handle for Yahoo Finance API
-##'
-##' A function to get the crumb, cookies, and handle required to authenticate and interact
-##' with the Yahoo Finance API.
-##'
-##' @return A list containing the following elements:
-##' \item{handle}{A curl handle object for subsequent requests.}
-##' \item{crumb}{A string representing the crumb value for authentication.}
-##' \item{cookies}{A data frame of cookies for the request.}
-##' @examples
-##' session <- get_session()
-##' @export
+#' Get the Crumb, Cookies, and Handle for Yahoo Finance API
+#'
+#' A function to get the crumb, cookies, and handle required to authenticate and interact
+#' with the Yahoo Finance API.
+#'
+#' @return A list containing the following elements:
+#' \item{handle}{A curl handle object for subsequent requests.}
+#' \item{crumb}{A string representing the crumb value for authentication.}
+#' \item{cookies}{A data frame of cookies for the request.}
+#' @examples
+#' session <- get_session()
+#' @export
 get_session <- function() {
   
   handle <- curl::new_handle()
@@ -201,23 +201,23 @@ get_session <- function() {
   
 }
 
-##' Get Data from the Yahoo Finance API
-##'
-##' A function to get data from the Yahoo Finance API for symbols using a date 
-##' range and interval.
-##'
-##' @param symbols string. Symbol or vector of symbols.
-##' @param from_date string. Start date in \code{"YYYY-MM-DD"} format (e.g., \code{"2007-01-01"}).
-##' @param to_date string. End date in \code{"YYYY-MM-DD"} format.
-##' @param interval string. Data interval (see \code{"data_intervals"}).
-##' @return A data frame or list of data frame(s) that contains data from the
-##' Yahoo Finance API for the specified symbol(s).
-##'
-##' @examples
-##' \dontrun{
-##' data <- get_data(c("AAPL", "MSFT"))
-##' }
-##' @export
+#' Get Data from the Yahoo Finance API
+#'
+#' A function to get data from the Yahoo Finance API for symbols using a date 
+#' range and interval.
+#'
+#' @param symbols string. Symbol or vector of symbols.
+#' @param from_date string. Start date in \code{"YYYY-MM-DD"} format (e.g., \code{"2007-01-01"}).
+#' @param to_date string. End date in \code{"YYYY-MM-DD"} format.
+#' @param interval string. Data interval (see \code{"data_intervals"}).
+#' @return A data frame or list of data frame(s) that contains data from the
+#' Yahoo Finance API for the specified symbol(s).
+#'
+#' @examples
+#' \dontrun{
+#' data <- get_data(c("AAPL", "MSFT"))
+#' }
+#' @export
 get_data <- function(symbols, from_date = "2007-01-01", to_date = NULL, interval = "1d") {
   
   if (is.null(to_date)) {
@@ -354,22 +354,22 @@ get_data <- function(symbols, from_date = "2007-01-01", to_date = NULL, interval
   
 }
 
-##' Get a Column from the Yahoo Finance API
-##'
-##' A function to get a column from data retrieved from the Yahoo Finance API.
-##'
-##' @param data data frame or list. Data that contains an \code{index} column and
-##' the requested column created using the \code{\link{get_data}} function.
-##' @param col string. Column name to get (i.e., "open", "high", "low", "close", "adjclose", "volume").
-##' @return A data frame with rows as the \code{index} and columns as the symbols.
-##'
-##' @examples
-##' \dontrun{
-##' data <- get_data(c("AAPL", "MSFT"))
-##' 
-##' adj <- get_col(data, "adjclose")
-##' }
-##' @export
+#' Get a Column from the Yahoo Finance API
+#'
+#' A function to get a column from data retrieved from the Yahoo Finance API.
+#'
+#' @param data data frame or list. Data that contains an \code{index} column and
+#' the requested column created using the \code{\link{get_data}} function.
+#' @param col string. Column name to get (i.e., "open", "high", "low", "close", "adjclose", "volume").
+#' @return A data frame with rows as the \code{index} and columns as the symbols.
+#'
+#' @examples
+#' \dontrun{
+#' data <- get_data(c("AAPL", "MSFT"))
+#' 
+#' adj <- get_col(data, "adjclose")
+#' }
+#' @export
 get_col <- function(data, col) {
   
   check_col(col)
