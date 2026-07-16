@@ -46,7 +46,7 @@ check_intraday <- function(from_date, to_date, interval) {
   to_date <- as.POSIXct(to_date, tz = "UTC")
   
   if (to_date <= from_date) {
-    stop("value of 'to_date' must be greater than 'from_date'")
+    stop("value of 'to_date' must be greater than value of 'from_date'")
   }
   
   valid_lookback <- yfhist::data_intervals[["lookback"]][yfhist::data_intervals[["field"]] == interval]

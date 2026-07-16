@@ -72,7 +72,7 @@ class Check:
     to_date = pd.to_datetime(to_date, utc = True)
   
     if to_date <= from_date:
-      raise ValueError("value of 'to_date' must be greater than 'from_date'")
+      raise ValueError("value of 'to_date' must be greater than value of 'from_date'")
     
     valid_lookback = Data.intervals.loc[Data.intervals["field"] == interval, "lookback"].iloc[0]
     valid_intraday = Data.intervals.loc[Data.intervals["field"] == interval, "intraday"].iloc[0]
@@ -383,6 +383,8 @@ class Col:
       adj = yfh.get_col(data, "adjclose")
     """
     
+    Check.col(col)
+
     if isinstance(data, pd.DataFrame):
       
       col_i = Check.adjclose(data, col)
