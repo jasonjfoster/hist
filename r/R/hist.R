@@ -6,120 +6,159 @@
 "data_intervals"
 
 check_symbols <- function(symbols) {
-  
+
   if (is.character(symbols)) {
     symbols <- trimws(symbols)
   }
-  
+
   valid_symbols <- (is.character(symbols) && length(symbols) > 0 &&
                       all(nzchar(symbols)) && !anyNA(symbols))
-  
+
   if(!valid_symbols) {
     stop("invalid 'symbols'")
   }
-  
+
 }
 
 check_date <- function(date, type) {
-  
+
   valid_date <- as.Date(date, format = "%Y-%m-%d")
-  
+
   if (is.na(valid_date)) {
     stop(paste0("invalid '", type, "'"))
   }
-  
+
 }
 
 check_interval <- function(interval) {
-  
+
   valid_interval <- yfhist::data_intervals[["field"]]
-  
+
   if (!interval %in% valid_interval) {
     stop("invalid 'interval'")
   }
-  
+
 }
 
 check_intraday <- function(from_date, to_date, interval) {
-  
+
   from_date <- as.POSIXct(from_date, tz = "UTC")
   to_date <- as.POSIXct(to_date, tz = "UTC")
-  
+
   if (to_date <= from_date) {
     stop("value of 'to_date' must be greater than value of 'from_date'")
   }
-  
+
   valid_lookback <- yfhist::data_intervals[["lookback"]][yfhist::data_intervals[["field"]] == interval]
   valid_intraday <- yfhist::data_intervals[["intraday"]][yfhist::data_intervals[["field"]] == interval]
-  
+
   if (valid_intraday) {
-    
+
     n_secs <- as.numeric(to_date - from_date)
-    
+
     if (interval == "1m") {
-      
+
       max_secs <- 8 * 24 * 3600
-      
+
       if (n_secs > max_secs) {
         stop("number of days between 'from_date' and 'to_date' must be less than or equal to 8")
       }
-      
+
       n_days <- as.numeric(Sys.Date() - as.Date(from_date))
-      
+
       if (n_days > valid_lookback) {
         stop(paste0("number of days between 'from_date' and today must be less than ", valid_lookback))
       }
-      
+
     } else {
-      
+
       max_secs <- valid_lookback * 24 * 3600
-      
+
       if (n_secs > max_secs) {
         stop(paste0("number of days between 'from_date' and 'to_date' must be less than ", valid_lookback))
       }
-      
+
     }
-    
+
   }
-  
+
 }
 
 check_col <- function(col) {
-  
+
   valid_col <- c("open", "high", "low", "close", "adjclose", "volume")
-  
+
   if (!col %in% valid_col) {
     stop("invalid 'col'")
   }
-  
+
 }
 
 check_adjclose <- function(data, col) {
-  
+
   valid_col <- colnames(data)
-  
+
   if ((col == "adjclose") && (!col %in% valid_col)) {
     if ("close" %in% valid_col) {
-    
+
       warning("'adjclose' not found; using 'close' (intraday data)")
       result <- "close"
-      
+
     } else {
       stop("'adjclose' and 'close' not found")
     }
   } else {
     result <- col
   }
-  
+
   return(result)
-  
+
 }
 
 process_date <- function(date) {
-  
+
   # as.integer(as.POSIXct(date, tz = "UTC")) # 32-bit => overflow
   trunc(as.numeric(as.POSIXct(date, tz = "UTC"))) # 64-bit
-  
+
+}
+
+process_chart <- function(data, intraday) {
+
+  tz <- data[["meta"]][["exchangeTimezoneName"]]
+  ohlcv <- unlist(data[["indicators"]][["quote"]][[1]], recursive = FALSE)
+  index <- data[["timestamp"]][[1]]
+
+  if (!intraday) {
+
+    adjclose <- unlist(data[["indicators"]][["adjclose"]][[1]], recursive = FALSE)
+    index <- as.Date(as.POSIXct(index, origin = "1970-01-01", tz = "UTC"), tz = tz)
+
+    result <- data.frame(
+      "index" = index,
+      ohlcv,
+      "adjclose" = adjclose
+    )
+
+    cols <- c("index", "open", "high", "low", "close", "adjclose", "volume")
+
+  } else {
+
+    index <- as.POSIXct(index, origin = "1970-01-01", tz = "UTC")
+    index <- as.POSIXct(format(index, tz = tz, usetz = TRUE), tz = tz)
+
+    result <- data.frame(
+      "index" = index,
+      ohlcv
+    )
+
+    cols <- c("index", "open", "high", "low", "close", "volume")
+
+  }
+
+  result <- result[ , cols]
+
+  return(result)
+
 }
 
 process_url <- function(params) {
@@ -127,35 +166,35 @@ process_url <- function(params) {
 }
 
 with_env <- function(new_env, code) {
-  
+
   old_env <- list()
   env_names <- names(new_env)
-  
+
   for (i in 1:length(env_names)) {
-    
+
     name <- env_names[i]
     old_env[[name]] <- Sys.getenv(name, unset = NA)
-    
+
   }
-  
+
   on.exit({
     for (i in 1:length(env_names)) {
-      
+
       name <- env_names[i]
       val <- old_env[[name]]
-      
+
       if (is.na(val)) {
         Sys.unsetenv(name)
       } else {
         Sys.setenv(name = val)
       }
-      
+
     }
   }, add = TRUE)
-  
+
   do.call(Sys.setenv, as.list(new_env))
   force(code)
-  
+
 }
 
 #' Get the Crumb, Cookies, and Handle for Yahoo Finance API
@@ -171,39 +210,39 @@ with_env <- function(new_env, code) {
 #' session <- get_session()
 #' @export
 get_session <- function() {
-  
+
   handle <- curl::new_handle()
-  
+
   api_url <- "https://query1.finance.yahoo.com/v1/test/getcrumb"
-  
+
   headers <- c(
     `Accept` = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
     `User-Agent` = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36"
   )
-  
+
   curl::handle_setheaders(handle, .list = headers)
-  
+
   response <- with_env(c(CURL_SSL_BACKEND = "openssl"), {
     curl::curl_fetch_memory(api_url, handle = handle)
   })
-  
+
   crumb <- rawToChar(response$content)
-  
+
   cookies <- curl::handle_cookies(handle)
-  
+
   result <- list(
     handle = handle,
     crumb = crumb,
     cookies = cookies
   )
-  
+
   return(result)
-  
+
 }
 
 #' Get Data from the Yahoo Finance API
 #'
-#' A function to get data from the Yahoo Finance API for symbols using a date 
+#' A function to get data from the Yahoo Finance API for symbols using a date
 #' range and interval.
 #'
 #' @param symbols string. Symbol or vector of symbols.
@@ -219,139 +258,106 @@ get_session <- function() {
 #' }
 #' @export
 get_data <- function(symbols, from_date = "2007-01-01", to_date = NULL, interval = "1d") {
-  
+
   if (is.null(to_date)) {
     to_date <- Sys.time()
   }
-  
+
   check_symbols(symbols)
   check_date(from_date, type = "from_date")
   check_date(to_date, type = "to_date")
   check_interval(interval)
   check_intraday(from_date, to_date, interval)
-  
+
   session <- get_session()
   # crumb <- session[["crumb"]]
   cookies <- session[["cookies"]]
   handle <- session[["handle"]]
-  
+
   intraday <- yfhist::data_intervals[["intraday"]][yfhist::data_intervals[["field"]] == interval]
-  
+
   if (!intraday) {
-    
+
     # inclusive end: use midnight after to_date (exclusive bound)
     to_dt <- as.Date(to_date, tz = "UTC") + 1
     period2 <- process_date(to_dt)
-    
+
   } else {
-    
+
     # intraday: use exact timestamp
     period2 <- process_date(to_date)
-    
+
   }
-  
+
   params <- list(
     period1 = process_date(from_date),
     period2 = period2,
     interval = interval
   )
-  
+
   headers <- c(
     `Content-Type` = "application/json",
     `Cookie` = paste0(cookies[["name"]], "=", cookies[["value"]], collapse = "; ")
   )
-  
+
   count <- 0
   symbols_ls <- character()
   result_ls <- list()
-  
-  if (!intraday) {
-    cols <- c("index", "open", "high", "low", "close", "adjclose", "volume")
-  } else {
-    cols <- c("index", "open", "high", "low", "close", "volume")
-  }
-  
+
   for (symbol in symbols) {
-    
+
     api_url <- paste0("https://query1.finance.yahoo.com/v8/finance/chart/", symbol, process_url(params))
-    
+
     curl::handle_setheaders(handle, .list = headers) # set headers once!
-    
+
     result_df <- tryCatch({
-      
+
       response <- curl::curl(api_url, handle = handle)
-      
+
       result <- jsonlite::fromJSON(response)
       result[["chart"]][["result"]]
-      
+
     }, error = function(e) {
       return(data.frame())
     })
-    
+
     if (length(result_df) > 0) {
-      
-      tz <- result_df[["meta"]][["exchangeTimezoneName"]]
-      ohlcv <- unlist(result_df[["indicators"]][["quote"]][[1]], recursive = FALSE)
-      index <- result_df[["timestamp"]][[1]]
-      
-      if (!intraday) {
-        
-        adjclose <- unlist(result_df[["indicators"]][["adjclose"]][[1]], recursive = FALSE)
-        index <- as.Date(as.POSIXct(index, origin = "1970-01-01", tz = "UTC"), tz = tz)
-        
-        result_df <- data.frame(
-          "index" = index,
-          ohlcv,
-          "adjclose" = adjclose
-        )
-        
-      } else {
-        
-        index <- as.POSIXct(index, origin = "1970-01-01", tz = "UTC")
-        index <- as.POSIXct(format(index, tz = tz, usetz = TRUE), tz = tz)
-        
-        result_df <- data.frame(
-          "index" = index,
-          ohlcv
-        )
-        
-      }
-      
-      result_df <- result_df[ , cols]
-      
+
+      result_df <- process_chart(result_df, intraday)
+
       symbols_ls <- c(symbols_ls, symbol)
       result_ls <- append(result_ls, list(result_df))
-      
+
     }
-    
+
     count <- count + 1
-    
+
     if (count %% 5 == 0) {
-      
+
       message("pause one second after five requests")
       Sys.sleep(1)
-      
+
     }
-    
+
   }
-  
+
   if (length(result_ls) == 0) {
     return(data.frame())
   } else if (length(result_ls) == 1) {
-    
+
     df <- result_ls[[1]]
     attr(df, "symbol") <- symbols_ls[[1]]
-    
+
     return(df)
-    
+
   } else {
-    
+
     names(result_ls) <- symbols_ls
-    
+
     return(result_ls)
-    
+
   }
-  
+
 }
 
 #' Get a Column from the Yahoo Finance API
@@ -366,42 +372,42 @@ get_data <- function(symbols, from_date = "2007-01-01", to_date = NULL, interval
 #' @examples
 #' \dontrun{
 #' data <- get_data(c("AAPL", "MSFT"))
-#' 
+#'
 #' adj <- get_col(data, "adjclose")
 #' }
 #' @export
 get_col <- function(data, col) {
-  
+
   check_col(col)
-  
+
   if (is.data.frame(data)) {
-    
+
     col_i <- check_adjclose(data, col)
-    
+
     result <- data[ , c("index", col_i)]
-    
+
     symbol <- attr(data, "symbol")
     colnames(result) <- c("index", symbol)
-    
+
   } else if (is.list(data)) {
-    
+
     symbols <- names(data)
-    
+
     series_ls <- lapply(symbols, function(symbol) {
-      
+
       df <- data[[symbol]]
       col_i <- check_adjclose(df, col)
       df <- df[ , c("index", col_i)]
       colnames(df) <- c("index", symbol)
-      
+
       df
-      
+
     })
-    
+
     result <- Reduce(function(x, y) merge(x, y, by = "index", all = TRUE), series_ls)
-    
+
   }
-  
+
   return(result)
-  
+
 }
