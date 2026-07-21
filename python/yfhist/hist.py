@@ -248,7 +248,8 @@ class Session:
 
     return result
 
-def get(symbols, from_date = "2007-01-01", to_date = None, interval = "1d"):
+def get(symbols, from_date = "2007-01-01", to_date = None, interval = "1d",
+        session = None):
   """
   Get Data from the Yahoo Finance API
 
@@ -260,6 +261,8 @@ def get(symbols, from_date = "2007-01-01", to_date = None, interval = "1d"):
     from_date (str): start date in "YYYY-MM-DD" format (e.g., "2007-01-01").
     to_date (str): end date in "YYYY-MM-DD" format.
     interval (str): data interval (see `data_intervals`).
+    session (dict): session created using the `get_session` method. When a
+      session is not provided, a session is created internally.
 
   Returns:
     A data frame or dict of data frames that contains data from the
@@ -281,7 +284,9 @@ def get(symbols, from_date = "2007-01-01", to_date = None, interval = "1d"):
   Check.interval(interval)
   Check.intraday(from_date, to_date, interval)
 
-  session = Session.get()
+  if session is None:
+    session = Session.get()
+
   cookies = session["cookies"]
   handle = session["handle"]
 
@@ -317,7 +322,7 @@ def get(symbols, from_date = "2007-01-01", to_date = None, interval = "1d"):
 
   for symbol in symbols:
 
-    api_url = "https://query1.finance.yahoo.com/v8/finance/chart/" + symbol
+    api_url = f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}"
 
     try:
 

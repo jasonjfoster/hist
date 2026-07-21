@@ -249,6 +249,8 @@ get_session <- function() {
 #' @param from_date string. Start date in \code{"YYYY-MM-DD"} format (e.g., \code{"2007-01-01"}).
 #' @param to_date string. End date in \code{"YYYY-MM-DD"} format.
 #' @param interval string. Data interval (see \code{"data_intervals"}).
+#' @param session list. Session created using the \code{\link{get_session}}
+#' function. When a session is not provided, a session is created internally.
 #' @return A data frame or list of data frame(s) that contains data from the
 #' Yahoo Finance API for the specified symbol(s).
 #'
@@ -257,7 +259,8 @@ get_session <- function() {
 #' data <- get_data(c("AAPL", "MSFT"))
 #' }
 #' @export
-get_data <- function(symbols, from_date = "2007-01-01", to_date = NULL, interval = "1d") {
+get_data <- function(symbols, from_date = "2007-01-01", to_date = NULL,
+                     interval = "1d", session = NULL) {
 
   if (is.null(to_date)) {
     to_date <- Sys.time()
@@ -269,7 +272,10 @@ get_data <- function(symbols, from_date = "2007-01-01", to_date = NULL, interval
   check_interval(interval)
   check_intraday(from_date, to_date, interval)
 
-  session <- get_session()
+  if (is.null(session)) {
+    session <- get_session()
+  }
+
   # crumb <- session[["crumb"]]
   cookies <- session[["cookies"]]
   handle <- session[["handle"]]

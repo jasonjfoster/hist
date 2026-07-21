@@ -5,7 +5,7 @@
 \title{Get Data from the Yahoo Finance API}
 \usage{
 get_data(symbols, from_date = "2007-01-01", to_date = NULL,
-  interval = "1d")
+  interval = "1d", session = NULL)
 }
 \arguments{
 \item{symbols}{string. Symbol or vector of symbols.}
@@ -15,13 +15,16 @@ get_data(symbols, from_date = "2007-01-01", to_date = NULL,
 \item{to_date}{string. End date in \code{"YYYY-MM-DD"} format.}
 
 \item{interval}{string. Data interval (see \code{"data_intervals"}).}
+
+\item{session}{list. Session created using the \code{\link{get_session}}
+function. When a session is not provided, a session is created internally.}
 }
 \value{
 A data frame or list of data frame(s) that contains data from the
 Yahoo Finance API for the specified symbol(s).
 }
 \description{
-A function to get data from the Yahoo Finance API for symbols using a date 
+A function to get data from the Yahoo Finance API for symbols using a date
 range and interval.
 }
 \examples{
