@@ -43,8 +43,8 @@ class Check:
     if isinstance(symbols, str):
       symbols = [symbols]
 
-    valid_symbols = (isinstance(symbols, (list, tuple)) and len(symbols) > 0 and
-      all(isinstance(s, str) and s.strip() != "" for s in symbols))
+    valid_symbols = (isinstance(symbols, (list, tuple)) and (len(symbols) > 0) and
+      all(isinstance(s, str) and (s.strip() != "") for s in symbols))
 
     if not valid_symbols:
       raise ValueError("invalid 'symbols'")
@@ -115,7 +115,7 @@ class Check:
 
     valid_col = data.columns
 
-    if ((col == "adjclose") and (col not in valid_col)):
+    if (col == "adjclose") and (col not in valid_col):
       if ("close" in valid_col):
 
         warnings.warn("'adjclose' not found; using 'close' (intraday data)", UserWarning)

@@ -11,10 +11,10 @@ check_symbols <- function(symbols) {
     symbols <- trimws(symbols)
   }
 
-  valid_symbols <- (is.character(symbols) && length(symbols) > 0 &&
-                      all(nzchar(symbols)) && !anyNA(symbols))
+  valid_symbols <- is.character(symbols) && (length(symbols) > 0) &&
+    all(nzchar(symbols)) && !anyNA(symbols)
 
-  if(!valid_symbols) {
+  if (!valid_symbols) {
     stop("invalid 'symbols'")
   }
 
