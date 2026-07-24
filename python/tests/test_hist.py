@@ -17,15 +17,15 @@ def test_that(): # valid 'from_date' and 'interval'
   errors_ls = []
 
   for field in fields:
-    
+
     lookback = yfh.data_intervals.loc[yfh.data_intervals["field"] == field, "lookback"].item()
-    
+
     if pd.isna(lookback):
       lookback = None
-    
+
     to_date = pd.Timestamp.now(tz = "UTC")
-    
-    if (lookback is None):
+
+    if lookback is None:
       from_date = "2007-01-01"
     else:
       if (field == "1m"):
@@ -34,37 +34,37 @@ def test_that(): # valid 'from_date' and 'interval'
         from_date = to_date - pd.Timedelta(days = int(lookback) - 1)
 
     for symbols in test_symbols:
-      
+
       try:
-  
+
         data = yfh.get_data(symbols, from_date = from_date,
                             to_date = to_date, interval = field)
-        
+
         for col in test_cols:
           response = yfh.get_col(data, col)
-        
-        # if (response is None):
+
+        # if response is None:
         #   response = "success"
-          
+
       except:
         response = None
-  
+
       if response is None:
-  
+
         errors_ls.append({
           "symbols": symbols if isinstance(symbols, str) else ", ".join(symbols),
           # "symbols": ", ".join(symbols),
           "field": field
         })
-  
+
       count += 1
-          
+
       if (count % 5 == 0):
-              
+
         print("pause one second after five requests")
         time.sleep(1)
 
-  if len(errors_ls) > 0:
+  if (len(errors_ls) > 0):
     result_ls.extend(errors_ls)
 
   result_df = pd.DataFrame(result_ls)

@@ -186,7 +186,7 @@ with_env <- function(new_env, code) {
       if (is.na(val)) {
         Sys.unsetenv(name)
       } else {
-        Sys.setenv(name = val)
+        do.call(Sys.setenv, old_env[name])
       }
 
     }
@@ -276,7 +276,6 @@ get_data <- function(symbols, from_date = "2007-01-01", to_date = NULL,
     session <- get_session()
   }
 
-  # crumb <- session[["crumb"]]
   cookies <- session[["cookies"]]
   handle <- session[["handle"]]
 

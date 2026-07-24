@@ -53,7 +53,7 @@ class Check:
   def date(date, type):
 
     try:
-      pd.to_datetime(date)
+      pd.to_datetime(date, format = "%Y-%m-%d")
     except ValueError:
       raise ValueError(f"invalid '{type}'")
 
@@ -62,7 +62,7 @@ class Check:
 
     valid_interval = set(Data.intervals["field"])
 
-    if interval not in valid_interval:
+    if (interval not in valid_interval):
       raise ValueError("invalid 'interval'")
 
   @staticmethod
@@ -71,7 +71,7 @@ class Check:
     from_date = pd.to_datetime(from_date, utc = True)
     to_date = pd.to_datetime(to_date, utc = True)
 
-    if to_date <= from_date:
+    if (to_date <= from_date):
       raise ValueError("value of 'to_date' must be greater than value of 'from_date'")
 
     valid_lookback = Data.intervals.loc[Data.intervals["field"] == interval, "lookback"].iloc[0]
@@ -81,25 +81,25 @@ class Check:
 
       n_secs = (to_date - from_date).total_seconds()
 
-      if interval == "1m":
+      if (interval == "1m"):
 
         max_secs = 8 * 24 * 3600
 
-        if n_secs > max_secs:
+        if (n_secs > max_secs):
           raise ValueError("number of days between 'from_date' and 'to_date' must be less than or equal to 8")
 
         today_utc = pd.Timestamp.now(tz = "UTC").normalize()
         from_date0 = from_date.normalize()
         n_days = (today_utc - from_date0).days
 
-        if n_days > valid_lookback:
+        if (n_days > valid_lookback):
           raise ValueError(f"number of days between 'from_date' and today must be less than {valid_lookback}")
 
       else:
 
         max_secs = valid_lookback * 24 * 3600
 
-        if n_secs > max_secs:
+        if (n_secs > max_secs):
           raise ValueError(f"number of days between 'from_date' and 'to_date' must be less than {valid_lookback}")
 
   @staticmethod
@@ -107,7 +107,7 @@ class Check:
 
     valid_col = ["open", "high", "low", "close", "adjclose", "volume"]
 
-    if col not in valid_col:
+    if (col not in valid_col):
       raise ValueError("invalid 'col'")
 
   @staticmethod
@@ -343,7 +343,7 @@ def get(symbols, from_date = "2007-01-01", to_date = None, interval = "1d",
 
     count += 1
 
-    if count % 5 == 0:
+    if (count % 5 == 0):
 
       print("pause one second after five requests")
       time.sleep(1)
@@ -396,7 +396,7 @@ class Col:
       symbol = data.attrs.get("symbol", col_i)
       result.columns = ["index", symbol]
 
-    elif (isinstance(data, dict)):
+    elif isinstance(data, dict):
 
       series_ls = []
 
