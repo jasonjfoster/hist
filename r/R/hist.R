@@ -328,10 +328,18 @@ get_data <- function(symbols, from_date = "2007-01-01", to_date = NULL,
 
     if (length(result_df) > 0) {
 
-      result_df <- process_chart(result_df, intraday)
+      result_df <- tryCatch({
+        process_chart(result_df, intraday)
+      }, error = function(e) {
+        return(data.frame())
+      })
 
-      symbols_ls <- c(symbols_ls, symbol)
-      result_ls <- append(result_ls, list(result_df))
+      if (nrow(result_df) > 0) {
+
+        symbols_ls <- c(symbols_ls, symbol)
+        result_ls <- append(result_ls, list(result_df))
+
+      }
 
     }
 

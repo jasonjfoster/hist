@@ -336,10 +336,15 @@ def get(symbols, from_date = "2007-01-01", to_date = None, interval = "1d",
 
     if (len(result_df) > 0):
 
-      result_df = Process.chart(result_df, intraday)
+      try:
+        result_df = Process.chart(result_df, intraday)
+      except:
+        result_df = pd.DataFrame()
 
-      symbols_ls.append(symbol)
-      result_ls[symbol] = result_df
+      if (len(result_df) > 0):
+
+        symbols_ls.append(symbol)
+        result_ls[symbol] = result_df
 
     count += 1
 
