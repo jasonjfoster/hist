@@ -242,8 +242,8 @@ get_session <- function() {
 
 #' Get Data from the Yahoo Finance API
 #'
-#' A function to get data from the Yahoo Finance API for symbols using a date
-#' range and interval.
+#' A function to get data from the Yahoo Finance API for one or more symbols
+#' with optional date range and interval.
 #'
 #' @param symbols string. Symbol or vector of symbols.
 #' @param from_date string. Start date in \code{"YYYY-MM-DD"} format (e.g., \code{"2007-01-01"}).
@@ -377,8 +377,8 @@ get_data <- function(symbols, from_date = "2007-01-01", to_date = NULL,
 #'
 #' A function to get a column from data retrieved from the Yahoo Finance API.
 #'
-#' @param data data frame or list. Data that contains an \code{index} column and
-#' the requested column created using the \code{\link{get_data}} function.
+#' @param data data frame or list. Data created using the \code{\link{get_data}}
+#' function that contains an \code{index} column and the requested column.
 #' @param col string. Column name to get (i.e., "open", "high", "low", "close", "adjclose", "volume").
 #' @return A data frame with rows as the \code{index} and columns as the symbols.
 #'

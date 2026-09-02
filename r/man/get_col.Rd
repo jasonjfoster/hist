@@ -7,8 +7,8 @@
 get_col(data, col)
 }
 \arguments{
-\item{data}{data frame or list. Data that contains an \code{index} column and
-the requested column created using the \code{\link{get_data}} function.}
+\item{data}{data frame or list. Data created using the \code{\link{get_data}}
+function that contains an \code{index} column and the requested column.}
 
 \item{col}{string. Column name to get (i.e., "open", "high", "low", "close", "adjclose", "volume").}
 }

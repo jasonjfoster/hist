@@ -24,8 +24,8 @@ A data frame or list of data frame(s) that contains data from the
 Yahoo Finance API for the specified symbol(s).
 }
 \description{
-A function to get data from the Yahoo Finance API for symbols using a date
-range and interval.
+A function to get data from the Yahoo Finance API for one or more symbols
+with optional date range and interval.
 }
 \examples{
 \dontrun{

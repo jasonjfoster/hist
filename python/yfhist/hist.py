@@ -253,8 +253,8 @@ def get(symbols, from_date = "2007-01-01", to_date = None, interval = "1d",
   """
   Get Data from the Yahoo Finance API
 
-  A method to get data from the Yahoo Finance API for symbols using a date
-  range and interval.
+  A method to get data from the Yahoo Finance API for one or more symbols
+  with optional date range and interval.
 
   Parameters:
     symbols (str or list of str): symbol or list of symbols.
@@ -377,8 +377,9 @@ class Col:
     A method to get a column from data retrieved from the Yahoo Finance API.
 
     Parameters:
-      data (data frame or dict of data frames): data that contains an `index` column
-        and the requested column created using the `get_data` method.
+      data (data frame or dict of data frames): data created using the
+        `get_data` method that contains an `index` column and the requested
+        column.
       col (str): column name to get (i.e., "open", "high", "low", "close", "adjclose", "volume").
 
     Returns:
