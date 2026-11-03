@@ -12,5 +12,8 @@ data_intervals
 }
 \description{
 A data frame with the available intervals data for the Yahoo Finance API.
+Each row gives the \code{name} and \code{field} of an interval, whether it is
+\code{intraday}, and the \code{lookback} in days that the \code{\link{get_data}}
+function enforces for intraday intervals.
 }
 \keyword{datasets}

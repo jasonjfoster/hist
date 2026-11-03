@@ -1,6 +1,9 @@
 #' Intervals Data for the Yahoo Finance API
 #'
 #' A data frame with the available intervals data for the Yahoo Finance API.
+#' Each row gives the \code{name} and \code{field} of an interval, whether it is
+#' \code{intraday}, and the \code{lookback} in days that the \code{\link{get_data}}
+#' function enforces for intraday intervals.
 #'
 #' @format A data frame.
 "data_intervals"
@@ -54,30 +57,21 @@ check_intraday <- function(from_date, to_date, interval) {
 
   if (valid_intraday) {
 
-    n_secs <- as.numeric(to_date - from_date)
-
     if (interval == "1m") {
 
+      n_secs <- as.numeric(difftime(to_date, from_date, units = "secs"))
       max_secs <- 8 * 24 * 3600
 
       if (n_secs > max_secs) {
         stop("number of days between 'from_date' and 'to_date' must be less than or equal to 8")
       }
 
-      n_days <- as.numeric(Sys.Date() - as.Date(from_date))
+    }
 
-      if (n_days > valid_lookback) {
-        stop(paste0("number of days between 'from_date' and today must be less than ", valid_lookback))
-      }
+    n_days <- as.numeric(difftime(Sys.time(), from_date, units = "days"))
 
-    } else {
-
-      max_secs <- valid_lookback * 24 * 3600
-
-      if (n_secs > max_secs) {
-        stop(paste0("number of days between 'from_date' and 'to_date' must be less than ", valid_lookback))
-      }
-
+    if (n_days >= valid_lookback) {
+      stop(paste0("number of days between 'from_date' and today must be less than ", valid_lookback))
     }
 
   }
@@ -247,10 +241,22 @@ get_session <- function() {
 #'
 #' @param symbols string. Symbol or vector of symbols.
 #' @param from_date string. Start date in \code{"YYYY-MM-DD"} format (e.g., \code{"2007-01-01"}).
-#' @param to_date string. End date in \code{"YYYY-MM-DD"} format.
+#' @param to_date string. End date in \code{"YYYY-MM-DD"} format, inclusive for daily and
+#' longer intervals and the exact timestamp for intraday intervals.
 #' @param interval string. Data interval (see \code{"data_intervals"}).
 #' @param session list. Session created using the \code{\link{get_session}}
 #' function. When a session is not provided, a session is created internally.
+#' @details Intraday intervals are limited by the \code{lookback} in
+#' \code{data_intervals}: \code{from_date} must be within the lookback of today (30 days
+#' for \code{"1m"}, 730 for \code{"60m"} and \code{"1h"}, and 60 for the other intraday
+#' intervals), and for \code{"1m"} the range may span at most 8 days. The \code{index} is
+#' a date, or a date-time for intraday intervals, in the exchange's time zone, and the
+#' \code{adjclose} column is present for daily and longer intervals only.
+#'
+#' One request is made per symbol, and a session (crumb, cookies, and handle) can be
+#' reused across calls with one second paused after every five requests. Symbols with no
+#' data are dropped, a single symbol returns a data frame with the symbol as an attribute,
+#' and no data at all returns an empty data frame.
 #' @return A data frame or list of data frame(s) that contains data from the
 #' Yahoo Finance API for the specified symbol(s).
 #'
@@ -380,6 +386,10 @@ get_data <- function(symbols, from_date = "2007-01-01", to_date = NULL,
 #' @param data data frame or list. Data created using the \code{\link{get_data}}
 #' function that contains an \code{index} column and the requested column.
 #' @param col string. Column name to get (i.e., "open", "high", "low", "close", "adjclose", "volume").
+#' @details \code{"adjclose"} falls back to \code{"close"} with a warning when the data is
+#' intraday. For a single data frame the result has an \code{index} column and a column
+#' named by the symbol; for a list the series are merged on \code{index} with an outer
+#' join, so a date missing for one symbol is missing in that column.
 #' @return A data frame with rows as the \code{index} and columns as the symbols.
 #'
 #' @examples

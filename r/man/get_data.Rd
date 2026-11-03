@@ -12,7 +12,8 @@ get_data(symbols, from_date = "2007-01-01", to_date = NULL,
 
 \item{from_date}{string. Start date in \code{"YYYY-MM-DD"} format (e.g., \code{"2007-01-01"}).}
 
-\item{to_date}{string. End date in \code{"YYYY-MM-DD"} format.}
+\item{to_date}{string. End date in \code{"YYYY-MM-DD"} format, inclusive for daily and
+longer intervals and the exact timestamp for intraday intervals.}
 
 \item{interval}{string. Data interval (see \code{"data_intervals"}).}
 
@@ -26,6 +27,19 @@ Yahoo Finance API for the specified symbol(s).
 \description{
 A function to get data from the Yahoo Finance API for one or more symbols
 with optional date range and interval.
+}
+\details{
+Intraday intervals are limited by the \code{lookback} in
+\code{data_intervals}: \code{from_date} must be within the lookback of today (30 days
+for \code{"1m"}, 730 for \code{"60m"} and \code{"1h"}, and 60 for the other intraday
+intervals), and for \code{"1m"} the range may span at most 8 days. The \code{index} is
+a date, or a date-time for intraday intervals, in the exchange's time zone, and the
+\code{adjclose} column is present for daily and longer intervals only.
+
+One request is made per symbol, and a session (crumb, cookies, and handle) can be
+reused across calls with one second paused after every five requests. Symbols with no
+data are dropped, a single symbol returns a data frame with the symbol as an attribute,
+and no data at all returns an empty data frame.
 }
 \examples{
 \dontrun{

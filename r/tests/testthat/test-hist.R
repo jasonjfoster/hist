@@ -1,6 +1,6 @@
 test_that("valid 'from_date' and 'interval'", {
 
-  # skip("long-running test")
+  skip_on_cran()
 
   fields <- yfhist::data_intervals[["field"]]
 
@@ -36,7 +36,7 @@ test_that("valid 'from_date' and 'interval'", {
                                           to_date = to_date, interval = field))
 
         for (col in test_cols) {
-          response <- get_col(data, col)
+          response <- suppressWarnings(get_col(data, col))
         }
 
         # if (is.null(response)) {

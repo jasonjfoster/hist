@@ -1,10 +1,9 @@
-# import pytest
 import time
+import warnings
 import pandas as pd
 import yfhist as yfh
 
-# @pytest.mark.skip(reason = "long-running test")
-
+# test arguments
 test_symbols = ["AAPL", ["AAPL", "MSFT"], ["AAPL", "MSFT", "AMZN"]]
 test_cols = ["open", "high", "low", "close", "adjclose", "volume"]
 
@@ -41,7 +40,9 @@ def test_that(): # valid 'from_date' and 'interval'
                             to_date = to_date, interval = field)
 
         for col in test_cols:
-          response = yfh.get_col(data, col)
+          with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            response = yfh.get_col(data, col)
 
         # if response is None:
         #   response = "success"
@@ -53,7 +54,6 @@ def test_that(): # valid 'from_date' and 'interval'
 
         errors_ls.append({
           "symbols": symbols if isinstance(symbols, str) else ", ".join(symbols),
-          # "symbols": ", ".join(symbols),
           "field": field
         })
 

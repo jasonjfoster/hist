@@ -18,6 +18,12 @@ A data frame with rows as the \code{index} and columns as the symbols.
 \description{
 A function to get a column from data retrieved from the Yahoo Finance API.
 }
+\details{
+\code{"adjclose"} falls back to \code{"close"} with a warning when the data is
+intraday. For a single data frame the result has an \code{index} column and a column
+named by the symbol; for a list the series are merged on \code{index} with an outer
+join, so a date missing for one symbol is missing in that column.
+}
 \examples{
 \dontrun{
 data <- get_data(c("AAPL", "MSFT"))

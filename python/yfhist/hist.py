@@ -24,6 +24,8 @@ class Data:
     Intervals Data for the Yahoo Finance API
 
     A data frame with the available intervals data for the Yahoo Finance API.
+    Each row gives the `name` and `field` of an interval, whether it is `intraday`, and
+    the `lookback` in days that the `get_data` function enforces for intraday intervals.
 
     Returns:
       A data frame.
@@ -79,28 +81,18 @@ class Check:
 
     if bool(valid_intraday):
 
-      n_secs = (to_date - from_date).total_seconds()
-
       if (interval == "1m"):
 
+        n_secs = (to_date - from_date).total_seconds()
         max_secs = 8 * 24 * 3600
 
         if (n_secs > max_secs):
           raise ValueError("number of days between 'from_date' and 'to_date' must be less than or equal to 8")
 
-        today_utc = pd.Timestamp.now(tz = "UTC").normalize()
-        from_date0 = from_date.normalize()
-        n_days = (today_utc - from_date0).days
+      n_days = (pd.Timestamp.now(tz = "UTC") - from_date).total_seconds() / (24 * 3600)
 
-        if (n_days > valid_lookback):
-          raise ValueError(f"number of days between 'from_date' and today must be less than {valid_lookback}")
-
-      else:
-
-        max_secs = valid_lookback * 24 * 3600
-
-        if (n_secs > max_secs):
-          raise ValueError(f"number of days between 'from_date' and 'to_date' must be less than {valid_lookback}")
+      if (n_days >= valid_lookback):
+        raise ValueError(f"number of days between 'from_date' and today must be less than {int(valid_lookback)}")
 
   @staticmethod
   def col(col):
@@ -122,7 +114,7 @@ class Check:
         result = "close"
 
       else:
-        raise KeyError("'adjclose' and 'close' not found")
+        raise ValueError("'adjclose' and 'close' not found")
 
     else:
       result = col
@@ -210,7 +202,7 @@ class Session:
     """
     Get the Crumb, Cookies, and Handle for the Yahoo Finance API
 
-    A method to get the crumb, cookies, and handle required to authenticate and interact
+    A function to get the crumb, cookies, and handle required to authenticate and interact
     with the Yahoo Finance API.
 
     Returns:
@@ -253,15 +245,27 @@ def get(symbols, from_date = "2007-01-01", to_date = None, interval = "1d",
   """
   Get Data from the Yahoo Finance API
 
-  A method to get data from the Yahoo Finance API for one or more symbols
+  A function to get data from the Yahoo Finance API for one or more symbols
   with optional date range and interval.
+
+  Intraday intervals are limited by the `lookback` in `data_intervals`: `from_date` must
+  be within the lookback of today (30 days for "1m", 730 for "60m" and "1h", and 60 for
+  the other intraday intervals), and for "1m" the range may span at most 8 days. The
+  `index` is a date, or a date-time for intraday intervals, in the exchange's time zone,
+  and the `adjclose` column is present for daily and longer intervals only.
+
+  One request is made per symbol, and a session (crumb, cookies, and handle) can be
+  reused across calls with one second paused after every five requests. Symbols with no
+  data are dropped, a single symbol returns a data frame with the symbol as an attribute,
+  and no data at all returns an empty data frame.
 
   Parameters:
     symbols (str or list of str): symbol or list of symbols.
     from_date (str): start date in "YYYY-MM-DD" format (e.g., "2007-01-01").
-    to_date (str): end date in "YYYY-MM-DD" format.
+    to_date (str): end date in "YYYY-MM-DD" format, inclusive for daily and longer
+      intervals and the exact timestamp for intraday intervals.
     interval (str): data interval (see `data_intervals`).
-    session (dict): session created using the `get_session` method. When a
+    session (dict): session created using the `get_session` function. When a
       session is not provided, a session is created internally.
 
   Returns:
@@ -374,11 +378,16 @@ class Col:
     """
     Get a Column from the Yahoo Finance API
 
-    A method to get a column from data retrieved from the Yahoo Finance API.
+    A function to get a column from data retrieved from the Yahoo Finance API.
+
+    "adjclose" falls back to "close" with a warning when the data is intraday. For a
+    single data frame the result has an `index` column and a column named by the symbol;
+    for a dict the series are merged on `index` with an outer join, so a date missing for
+    one symbol is missing in that column.
 
     Parameters:
       data (data frame or dict of data frames): data created using the
-        `get_data` method that contains an `index` column and the requested
+        `get_data` function that contains an `index` column and the requested
         column.
       col (str): column name to get (i.e., "open", "high", "low", "close", "adjclose", "volume").
 
