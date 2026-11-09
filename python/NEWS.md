@@ -4,7 +4,7 @@
 
 * Added the `session` argument to the `get_data` method to reuse a session across calls
 
-* Added an input check for the `col` argument of the `get_col` method
+* Added input checks for the `col` and `data` arguments of the `get_col` method
 
 * Fixed an issue for symbols with no data in the `get_data` method
 

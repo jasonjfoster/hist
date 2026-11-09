@@ -103,6 +103,25 @@ class Check:
       raise ValueError("invalid 'col'")
 
   @staticmethod
+  def data(data):
+
+    if isinstance(data, pd.DataFrame):
+      symbols = data.attrs.get("symbol")
+    elif isinstance(data, dict):
+      symbols = list(data.keys())
+    else:
+      symbols = None
+
+    if isinstance(symbols, str):
+      symbols = [symbols]
+
+    valid_data = (isinstance(symbols, (list, tuple)) and (len(symbols) > 0) and
+      all(isinstance(s, str) and (s.strip() != "") for s in symbols))
+
+    if not valid_data:
+      raise ValueError("invalid 'data'")
+
+  @staticmethod
   def adjclose(data, col):
 
     valid_col = data.columns
@@ -400,6 +419,7 @@ class Col:
     """
 
     Check.col(col)
+    Check.data(data)
 
     if isinstance(data, pd.DataFrame):
 
@@ -408,7 +428,7 @@ class Col:
       result = data.loc[:, ["index", col_i]].copy()
       result["index"] = pd.to_datetime(result["index"])
 
-      symbol = data.attrs.get("symbol", col_i)
+      symbol = data.attrs["symbol"]
       result.columns = ["index", symbol]
 
     elif isinstance(data, dict):

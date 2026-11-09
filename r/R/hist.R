@@ -88,6 +88,29 @@ check_col <- function(col) {
 
 }
 
+check_data <- function(data) {
+
+  if (is.data.frame(data)) {
+    symbols <- attr(data, "symbol")
+  } else if (is.list(data)) {
+    symbols <- names(data)
+  } else {
+    symbols <- NULL
+  }
+
+  if (is.character(symbols)) {
+    symbols <- trimws(symbols)
+  }
+
+  valid_data <- is.character(symbols) && (length(symbols) > 0) &&
+    all(nzchar(symbols)) && !anyNA(symbols)
+
+  if (!valid_data) {
+    stop("invalid 'data'")
+  }
+
+}
+
 check_adjclose <- function(data, col) {
 
   valid_col <- colnames(data)
@@ -402,6 +425,7 @@ get_data <- function(symbols, from_date = "2007-01-01", to_date = NULL,
 get_col <- function(data, col) {
 
   check_col(col)
+  check_data(data)
 
   if (is.data.frame(data)) {
 

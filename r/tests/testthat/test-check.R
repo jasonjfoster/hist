@@ -1,18 +1,6 @@
 test_that("input checks", {
 
   # test data
-  test_check_daily <- data.frame(
-    index = as.Date(c("2023-01-03", "2023-01-04")),
-    open = c(1, 2),
-    high = c(1, 2),
-    low = c(1, 2),
-    close = c(1, 2),
-    adjclose = c(1, 2),
-    volume = c(1, 2)
-  )
-  attr(test_check_daily, "symbol") <- "AAPL"
-  test_check_intraday <- test_check_daily[ , colnames(test_check_daily) != "adjclose"]
-  attr(test_check_intraday, "symbol") <- "AAPL"
   test_check_symbols <- "AAPL"
   test_check_today <- Sys.Date()
 
@@ -58,28 +46,17 @@ test_that("input checks", {
   expect_error(get_col(test_check_daily, "price"),
                "invalid 'col'")
 
+  # check_data
+  expect_error(get_col(test_check_data, "close"),
+               "invalid 'data'")
+
   # check_adjclose
-  expect_error(get_col(test_check_intraday[ , colnames(test_check_intraday) != "close"],
-                       "adjclose"),
+  expect_error(get_col(test_check_noclose, "adjclose"),
                "'adjclose' and 'close' not found")
 
 })
 
 test_that("input warnings", {
-
-  # test data
-  test_check_daily <- data.frame(
-    index = as.Date(c("2023-01-03", "2023-01-04")),
-    open = c(1, 2),
-    high = c(1, 2),
-    low = c(1, 2),
-    close = c(1, 2),
-    adjclose = c(1, 2),
-    volume = c(1, 2)
-  )
-  attr(test_check_daily, "symbol") <- "AAPL"
-  test_check_intraday <- test_check_daily[ , colnames(test_check_daily) != "adjclose"]
-  attr(test_check_intraday, "symbol") <- "AAPL"
 
   # check_adjclose
   expect_warning(get_col(test_check_intraday, "adjclose"),

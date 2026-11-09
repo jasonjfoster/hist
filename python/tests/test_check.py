@@ -4,21 +4,27 @@ import pytest
 import pandas as pd
 import yfhist as yfh
 
+# test data
+test_check_daily = pd.DataFrame({
+  "index": pd.to_datetime(["2023-01-03", "2023-01-04"]).date,
+  "open": [1, 2],
+  "high": [1, 2],
+  "low": [1, 2],
+  "close": [1, 2],
+  "adjclose": [1, 2],
+  "volume": [1, 2]
+})
+test_check_daily.attrs["symbol"] = "AAPL"
+test_check_intraday = test_check_daily.drop(columns = "adjclose")
+test_check_intraday.attrs["symbol"] = "AAPL"
+test_check_noclose = test_check_intraday.drop(columns = "close")
+test_check_noclose.attrs["symbol"] = "AAPL"
+test_check_data = test_check_daily.copy()
+test_check_data.attrs.pop("symbol", None)
+
 def test_check(): # input checks
 
   # test data
-  test_check_daily = pd.DataFrame({
-    "index": pd.to_datetime(["2023-01-03", "2023-01-04"]).date,
-    "open": [1, 2],
-    "high": [1, 2],
-    "low": [1, 2],
-    "close": [1, 2],
-    "adjclose": [1, 2],
-    "volume": [1, 2]
-  })
-  test_check_daily.attrs["symbol"] = "AAPL"
-  test_check_intraday = test_check_daily.drop(columns = "adjclose")
-  test_check_intraday.attrs["symbol"] = "AAPL"
   test_check_symbols = "AAPL"
   test_check_today = pd.Timestamp.now(tz = "UTC").normalize()
 
@@ -64,25 +70,15 @@ def test_check(): # input checks
   with pytest.raises(ValueError, match = re.escape("invalid 'col'")):
     yfh.get_col(test_check_daily, "price")
 
+  # check_data
+  with pytest.raises(ValueError, match = re.escape("invalid 'data'")):
+    yfh.get_col(test_check_data, "close")
+
   # check_adjclose
   with pytest.raises(ValueError, match = re.escape("'adjclose' and 'close' not found")):
-    yfh.get_col(test_check_intraday.drop(columns = "close"), "adjclose")
+    yfh.get_col(test_check_noclose, "adjclose")
 
 def test_warning(): # input warnings
-
-  # test data
-  test_check_daily = pd.DataFrame({
-    "index": pd.to_datetime(["2023-01-03", "2023-01-04"]).date,
-    "open": [1, 2],
-    "high": [1, 2],
-    "low": [1, 2],
-    "close": [1, 2],
-    "adjclose": [1, 2],
-    "volume": [1, 2]
-  })
-  test_check_daily.attrs["symbol"] = "AAPL"
-  test_check_intraday = test_check_daily.drop(columns = "adjclose")
-  test_check_intraday.attrs["symbol"] = "AAPL"
 
   # check_adjclose
   with pytest.warns(UserWarning, match = re.escape("'adjclose' not found; using 'close' (intraday data)")):
