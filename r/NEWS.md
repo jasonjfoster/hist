@@ -10,6 +10,8 @@
 
 * Fixed an issue for the date range and lookback checks of intraday intervals in the `get_data` function
 
+* Fixed an issue for the request headers in the `get_data` function
+
 * Fixed an issue for restoring the `CURL_SSL_BACKEND` environment variable in the `get_session` function
 
 * Added tests for input checks
